@@ -6,9 +6,8 @@ module AddressBook
       @ab = NullAddrBook
       if authorized?
         activate!
-        if block_given?
-          yield self
-        end
+        yield(self) if block_given?
+
       elsif block
         # asynchronous auth
         AddressBook.request_authorization do |granted|
@@ -19,11 +18,11 @@ module AddressBook
             block.call(nil)
           end
         end
+
       else
         # synchronous auth
-        if native_ab = AddressBook.address_book
-          @ab = LiveAddrBook.new(native_ab)
-        end
+        native_ab = AddressBook.address_book
+        @ab = LiveAddrBook.new(native_ab) if native_ab
       end
     end
 

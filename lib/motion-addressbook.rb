@@ -15,8 +15,11 @@ end
 
 lib_dir_path = File.dirname(File.expand_path(__FILE__))
 Motion::Project::App.setup do |app|
+  requires_deperecated_apis = app.deployment_target.to_i < 9
 
-  app.frameworks += ['AddressBook']
+  app.frameworks += ['Contacts']
+  app.frameworks += ['AddressBook'] if requires_deperecated_apis
+
   app.files.unshift(Dir.glob(File.join(lib_dir_path, "../motion/address_book.rb")))
 
   if app.respond_to?(:template) && app.template == :osx
@@ -24,7 +27,8 @@ Motion::Project::App.setup do |app|
     app.files.unshift(Dir.glob(File.join(lib_dir_path, "../motion/address_book/osx/**.rb")))
   else
     # We have an iOS project
-    app.frameworks += ['AddressBookUI']
+    app.frameworks += ['ContactsUI']
+    app.frameworks += ['AddressBookUI'] if requires_deperecated_apis
     app.files.unshift(Dir.glob(File.join(lib_dir_path, "../motion/address_book/ios/**.rb")))
   end
 end
