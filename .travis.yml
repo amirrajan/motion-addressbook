@@ -1,6 +1,13 @@
 language: objective-c
-notifications:
-  email:
-    recipients:
-      - alex@alexrothenberg.com
-      - jmay@pobox.com
+osx_image: xcode7.3
+xcode_sdk:
+  - iphonesimulator8.1
+  - iphonesimulator8.2
+  - iphonesimulator8.3
+  - iphonesimulator8.4
+  - iphonesimulator9.0
+  - iphonesimulator9.1
+  - iphonesimulator9.2
+  - iphonesimulator9.3
+before_install: sudo motion update
+script: bundle exec rake spec
