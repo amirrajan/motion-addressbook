@@ -9,6 +9,10 @@ module AddressBook
       }
 
       class << self
+        def granted?
+          status == :authorized
+        end
+
         def request(pointer, &callback)
           ABAddressBookRequestAccessWithCompletion(pointer, callback)
         end

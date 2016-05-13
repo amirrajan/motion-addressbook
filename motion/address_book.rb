@@ -1,7 +1,9 @@
 module AddressBook
   class << self
-    def instance(autoconnect = true)
-      Dispatch.once { @address_book ||= address_book(autoconnect) }
+    attr_accessor :auto_connect
+
+    def instance
+      Dispatch.once { @address_book ||= address_book(auto_connect) }
       @address_book
     end
 
@@ -19,6 +21,16 @@ module AddressBook
       end
     end
 
+    def authorized?
+      auth_handler.granted?
+    end
+
+    # Will return one of the following:
+    # :not_determined, :restricted, :denied, :authorized
+    def authorization_status
+      auth_handler.status
+    end
+
     private
 
     def address_book(autoconnect)
@@ -34,6 +46,13 @@ module AddressBook
     def address_book_class
       case AddressBook.framework_as_sym
       when :ab then AB::AddressBook
+      when :cn then nil
+      end
+    end
+
+    def auth_handler
+      case framework_as_sym
+      when :ab then AB::Authorization
       when :cn then nil
       end
     end

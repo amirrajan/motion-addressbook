@@ -3,27 +3,14 @@ module AddressBook
     class AddressBook
       # @param autoconnect [Boolean] Whether or not we should automatically
       #   request access on creation
-      def initialize(autoconnect = true)
-        connect if autoconnect
-      end
-
-      def authorized?
-        authorization_status == :authorized
-      end
-
-      # Will return one of the following:
-      # :not_determined
-      # :restricted
-      # :denied
-      # :authorized
-      def authorization_status
-        Authorization.status
+      def initialize(auto_connect = true)
+        connect if auto_connect
       end
 
       def connect
         return @connection if connected?
 
-        if authorized?
+        if Authorization.granted?
           options, error = [nil, nil]
           @connection = ABAddressBookCreateWithOptions(options, error)
         else
@@ -199,7 +186,7 @@ module AddressBook
       private
 
       def ensure_connection!
-        return if connected? && authorized?
+        return if connected? && Authorization.granted?
         raise "AddressBook must be created and authorized"
       end
     end

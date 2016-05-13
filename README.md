@@ -1,40 +1,39 @@
 # Addressbook for RubyMotion
 
-[![Build Status](https://secure.travis-ci.org/alexrothenberg/motion-addressbook.png)](http://travis-ci.org/alexrothenberg/motion-addressbook)
-[![Code Climate](https://codeclimate.com/github/alexrothenberg/motion-addressbook.png)](https://codeclimate.com/github/alexrothenberg/motion-addressbook)
-[![Gem Version](https://badge.fury.io/rb/motion-addressbook.png)](http://badge.fury.io/rb/motion-addressbook)
+[![Gem Version][gem-version-image]][gem-version-link]
+[![Dependencies Status][dependencies-image]][dependencies-link]
+[![Build Status][build-status-image]][build-status-link]
+[![Code Climate][code-climate-image]][code-climate-link]
 
-A RubyMotion wrapper around the iOS and OSX Address Book frameworks for RubyMotion apps.
+A RubyMotion wrapper around the iOS and OSX Address Book frameworks for
+RubyMotion apps.
 
-Apple's Address Book Programming Guide for [iOS](http://developer.apple.com/library/ios/#DOCUMENTATION/ContactData/Conceptual/AddressBookProgrammingGuideforiPhone/Introduction.html)
-or for [OSX](https://developer.apple.com/library/mac/#documentation/userexperience/Conceptual/AddressBook/AddressBook.html#//apple_ref/doc/uid/10000117i)
+Apple's Address Book Programming Guide for [iOS][ios-docs-link]
+or for [OSX][mac-docs-link]
+
+## Requirements
+
+* RubyMotion >= 2.8
+* iOS 6-9
 
 ## Installation
 
-### If you're using `bundler` (this is recommended):
+### Bundler (recommended)
 
-Add these lines to your application's `Rakefile`:
+Add it to your Gemfile:
+
+```ruby
+gem 'motion-addressbook'
+```
+
+Ensure you have these lines to your `Rakefile`:
 
 ```ruby
 require 'bundler'
 Bundler.require
 ```
 
-Add this line to your application's `Gemfile`:
-
-```ruby
-gem 'motion-addressbook'
-```
-
-And then execute:
-
-```bash
-$ bundle
-```
-
-### Manually without bundler
-
-Or install it yourself as:
+### Manual install
 
 ```bash
 $ gem install motion-addressbook
@@ -44,25 +43,40 @@ $ gem install motion-addressbook
 
 ### Requesting access
 
-iOS 6/7 requires that the user give permission before it allows an app to access the AddressBook.
-
 1 - Let the gem take care of it for you
 
 ```ruby
-ab = AddressBook::AddrBook.new
-# ...do something else...
-people = ab.people
+AddressBook.contacts
 ```
 
-The `people` method will raise an exception if called while
-authorization has not been granted.
+This will request authorization if it has not yet been requested, and raise if
+it has already been requested and was denied.
 
 2 - Manually decide when to ask the user for authorization
 
 ```ruby
-# asking whether we are already authorized
+# Disable auto-connection before calling anything else, otherwise the gem will
+# automatically request authorization if it has not already been requested
+AddressBook.auto_connect = false
+
+# Do some other stuff (maybe wait for the right screen)
+
+# Automatically connect if we're authorized, otherwise request authorization
+AddressBook.connect
+```
+
+3 - Manually decide when to ask and whether to wait for a response
+
+```ruby
+# To take full control whether we are already authorized
 if AddressBook.authorized?
   puts "This app is authorized!"
+  if AddressBook.connected?
+    puts "We already have access to the address book"
+  else
+    puts "We need to manually connect"
+    AddressBook.connect
+  end
 else
   puts "This app is not authorized!"
 end
@@ -73,12 +87,8 @@ if AddressBook.request_authorization
 else
   # do something now that the user has said "no"
 end
-```
 
-3 - Manually ask the user but do it asynchronously (this is how Apple's API works)
-
-```ruby
-# ask the user to authorize us
+# ask the user to authorize us (asynchronously)
 AddressBook.request_authorization do |granted|
   # this block is invoked sometime later
   if granted
@@ -93,14 +103,15 @@ end
 # do something here before the user has decided
 ```
 
-The iOS6 simulator does not demand AddressBook authorization. The iOS7
-simulator does.
+The iOS6 simulator does not demand AddressBook authorization. The iOS7 simulator
+does.
 
-### Showing the ABPeoplePickerNavigationController
+### UI -- NEEDS WORK (and untested)
+
+#### Showing the ABPeoplePickerNavigationController
 
 ```ruby
-address_book = AddressBook::AddrBook.new
-address_book.picker do |person|
+AddressBook::AB::UI::Picker(AddressBook.instance) do |person|
   if person
     # person is an AddressBook::Person object
   else
@@ -117,7 +128,7 @@ AddressBook.pick presenter: self do |person|
 end
 ```
 
-### Showing the ABNewPersonViewController
+#### Showing the ABNewPersonViewController
 
 ```ruby
 AddressBook.create do |person|
@@ -131,13 +142,12 @@ end
 
 ### Working with Person objects
 
-Get a list of existing people from the Address Book. On IOS, results
-are sorted using the sort order (First/Last or Last/First) chosen by
-the user in iOS Settings.
+Get a list of existing people from the Address Book. On IOS, results are sorted
+using the sort order (First/Last or Last/First) chosen by the user in iOS
+Settings.
 
 ```ruby
-ab = AddressBook::AddrBook.new
-ab.people
+AddressBook.people # Aliased to AddressBook.contacts
 => [#<AddressBook::Person:3: {:first_name=>"John", :last_name=>"Appleseed", ...}>, ...]
 ```
 
@@ -148,20 +158,26 @@ numbers, postal address, social profiles, and instant messaging
 profiles.
 
 ```ruby
-ab.create_person(:first_name => 'Alex', :last_name => 'Rothenberg', :emails => [{ :value => 'alex@example.com', :label => 'Home'}], :phones => [{ :value => '9920149993', :label => 'Mobile'}])
+AddressBook.create_person(
+  first_name: 'Alex',
+  last_name: 'Rothenberg',
+  emails: [{ label: 'Home', value: 'alex@example.com' }],
+  phones: [{ label: 'Mobile', value: '9920149993' }]
+)
 => #<AddressBook::Person:7: {:first_name=>"Alex", :last_name=>"Rothenberg", ...}>
 ```
 
-Construct a new blank Person but do not store it immediately in the Address Book.
+Construct a new Person but do not store it immediately in the Address Book.
 
 ```ruby
-ab.new_person(:first_name => "Bob")
+bob = AddressBook.new_person(first_name: 'Bob')
 => #<AddressBook::Person:-1: {:first_name=>"Bob"}>
-ab.last_name = 'Brown'
-ab.save
+bob.last_name = 'Brown'
+bob.save
 => #<AddressBook::Person:9: {:first_name=>"Bob", :last_name=>"Brown"}>
 ```
 
+<!--
 Get a list of all people matching one attribute with `.find_all_by_XXX`
 
 ```ruby
@@ -179,7 +195,7 @@ AddressBook::Person.find_by_email('alex@example.com')
 Get a list of all people matching several attributes with `.where`
 
 ```ruby
-AddressBook::Person.where(:email => 'alex@example.com', :first_name => 'Alex')
+AddressBook::Person.where(email: 'alex@example.com', first_name: 'Alex')
 => [#<AddressBook::Person:14: {:first_name=>"Alex", :last_name=>"Rothenberg", ...}>]
 ```
 
@@ -189,6 +205,7 @@ Look for an existing person or get a new one if none is found `find_or_new_by_XX
 AddressBook::Person.find_or_new_by_email('alex@example.com')
 => #<AddressBook::Person:17: {:first_name=>"Alex", :last_name=>"Rothenberg", ...}>]
 ```
+-->
 
 ### Update existing Person
 
@@ -210,38 +227,41 @@ alex.save
 ### Contact Groups
 
 ```ruby
-ab.groups
+AddressBook.groups
 => [#<AddressBook::Group:1:Friends: 1 members>, #<AddressBook::Group:2:Work: 0 members>]
 
-g = ab.groups.first
-g.members
+group = AddressBook.groups.first
+group.members
 => [#<AddressBook::Person:2: {:first_name=>"Daniel", :last_name=>"Higgins", ...}>]
 ```
 
 ### Notifications (\* iOS only \*)
 
-The iOS Address Book does not deliver notifications of changes through
-the standard Notification Center. `motion-addressbook` wraps the
-framework `ABAddressBookRegisterExternalChangeCallback` call with an
-optional handler that converts the update event to an iOS
-notification.
+The iOS Address Book does not deliver notifications of changes through the
+standard Notification Center. `motion-addressbook` wraps the framework
+`ABAddressBookRegisterExternalChangeCallback` call with an optional handler that
+converts the update event to an iOS notification.
 
 ```ruby
-ab.observe!
+AddressBook.observe!
 
-proc = Proc.new {|notification| NSLog "Address Book was changed!" }
-NSNotificationCenter.defaultCenter.addObserverForName(:addressbook_updated, object:nil, queue:NSOperationQueue.mainQueue, usingBlock:proc)
+callback = Proc.new { |notification| NSLog "Address Book was changed!" }
+NSNotificationCenter.defaultCenter.addObserverForName(:addressbook_updated,
+  object: nil,
+  queue: NSOperationQueue.mainQueue,
+  usingBlock: callback
+)
 
 # Or if you're using BubbleWrap:
-App.notification_center.observe :addressbook_updated do |notification|
+App.notification_center.observe(:addressbook_updated) do |notification|
   NSLog "Address Book was changed!"
 end
 ```
 
-The notification must be explicitly enabled in your application. In
-some cases iOS appears to trigger multiple notifications for the same
-change event, and if you are doing many changes at once you will
-receive a long stream of notifications.
+The notification must be explicitly enabled in your application. In some cases
+iOS appears to trigger multiple notifications for the same change event, and if
+you are doing many changes at once you will receive a long stream of
+notifications.
 
 ## Contributing
 
@@ -250,3 +270,14 @@ receive a long stream of notifications.
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+[build-status-link]: https://travis-ci.org/jbender/motion-addressbook
+[build-status-image]: https://img.shields.io/travis/jbender/motion-addressbook/master.svg?maxAge=2592000
+[code-climate-link]: https://codeclimate.com/github/jbender/motion-addressbook
+[code-climate-image]: https://img.shields.io/codeclimate/github/jbender/motion-addressbook.svg?maxAge=2592000
+[gem-version-link]: https://rubygems.org/gems/motion-addressbook
+[gem-version-image]: https://img.shields.io/gem/v/motion-addressbook.svg?maxAge=2592000
+[dependencies-link]: https://gemnasium.com/github.com/jbender/motion-addressbook
+[dependencies-image]: https://img.shields.io/gemnasium/jbender/motion-addressbook.svg?maxAge=2592000
+[ios-docs-link]: https://developer.apple.com/library/ios/documentation/AddressBook/Reference/AddressBook_iPhoneOS_Framework/index.html#//apple_ref/doc/uid/TP40007212
+[mac-docs-link]: https://developer.apple.com/library/mac/documentation/UserExperience/Reference/AddressBook/ObjC_classic/index.html#//apple_ref/doc/uid/20001692
