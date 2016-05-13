@@ -158,7 +158,7 @@ numbers, postal address, social profiles, and instant messaging
 profiles.
 
 ```ruby
-AddressBook.create_person(
+AddressBook.person_create(
   first_name: 'Alex',
   last_name: 'Rothenberg',
   emails: [{ label: 'Home', value: 'alex@example.com' }],
@@ -170,59 +170,36 @@ AddressBook.create_person(
 Construct a new Person but do not store it immediately in the Address Book.
 
 ```ruby
-bob = AddressBook.new_person(first_name: 'Bob')
+bob = AddressBook.person_new(first_name: 'Bob')
 => #<AddressBook::Person:-1: {:first_name=>"Bob"}>
 bob.last_name = 'Brown'
 bob.save
 => #<AddressBook::Person:9: {:first_name=>"Bob", :last_name=>"Brown"}>
 ```
 
-<!--
-Get a list of all people matching one attribute with `.find_all_by_XXX`
-
 ```ruby
-AddressBook::Person.find_all_by_email('alex@example.com')
+AddressBook.person_where(email: 'alex@example.com')
 => [#<AddressBook::Person:14: {:first_name=>"Alex", :last_name=>"Rothenberg", ...}>]
 ```
-
-Get the first person matching one attribute with `.find_by_XXX`
-
-```ruby
-AddressBook::Person.find_by_email('alex@example.com')
-=> #<AddressBook::Person:14: {:first_name=>"Alex", :last_name=>"Rothenberg", ...}>]
-```
-
-Get a list of all people matching several attributes with `.where`
-
-```ruby
-AddressBook::Person.where(email: 'alex@example.com', first_name: 'Alex')
-=> [#<AddressBook::Person:14: {:first_name=>"Alex", :last_name=>"Rothenberg", ...}>]
-```
-
-Look for an existing person or get a new one if none is found `find_or_new_by_XXX`
-
-```ruby
-AddressBook::Person.find_or_new_by_email('alex@example.com')
-=> #<AddressBook::Person:17: {:first_name=>"Alex", :last_name=>"Rothenberg", ...}>]
-```
--->
 
 ### Update existing Person
 
 ```ruby
-alex = AddressBook::Person.find_by_email('alex@example.com')
+alex = AddressBook.person_where(email: 'alex@example.com')
 alex.job_title = 'RubyMotion Developer'
 alex.save
 ```
 
+<!--
 Or to alter all the attributes at once (preserve the record identifier
 but change some or all of the values):
 
 ```ruby
-alex = AddressBook::Person.find_by_email('alex@example.com')
+alex = AddressBook.person_where(email: 'alex@example.com')
 alex.replace({:first_name=>"Alex", :last_name=>"Rider", ...})
 alex.save
 ```
+-->
 
 ### Contact Groups
 

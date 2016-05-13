@@ -153,6 +153,13 @@ module AddressBook
       end
       alias :contacts_count :people_count
 
+      def people_where(conditions)
+        ensure_connection!
+
+        people.select { |person| person.matches? conditions }
+      end
+      alias :contacts_where :people_where
+
       def person_new(attributes)
         ensure_connection!
 

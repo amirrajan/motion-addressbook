@@ -2,14 +2,14 @@ module AddressBook
   module AB
     class Person
       MULTI_VALUE_PROPERTY_MAP = {
-        3 => :phones,           # KABPersonPhoneProperty
-        4 => :emails,           # KABPersonEmailProperty
-        5 => :addresses,        # KABPersonAddressProperty
-        12 => :dates,           # KABPersonDateProperty
-        13 => :im_profiles,     # KABPersonInstantMessageProperty
-        22 => :urls,            # KABPersonURLProperty
-        23 => :related_names,   # KABPersonRelatedNamesProperty
-        46 => :social_profiles  # KABPersonSocialProfileProperty
+        3 => :phones,          # KABPersonPhoneProperty
+        4 => :emails,          # KABPersonEmailProperty
+        5 => :addresses,       # KABPersonAddressProperty
+        12 => :dates,          # KABPersonDateProperty
+        13 => :im_profiles,    # KABPersonInstantMessageProperty
+        22 => :urls,           # KABPersonURLProperty
+        23 => :related_names,  # KABPersonRelatedNamesProperty
+        46 => :social_profiles # KABPersonSocialProfileProperty
       }
       PROPERTY_MAP = {
         0 => :first_name,  # KABPersonFirstNameProperty
@@ -18,16 +18,16 @@ module AddressBook
         # undefined => :first_name_phonetic,  # KABPersonFirstNamePhoneticProperty
         # undefined => :last_name_phonetic,   # KABPersonLastNamePhoneticProperty
         # undefined => :middle_name_phonetic, # KABPersonMiddleNamePhoneticProperty
-        10 => :organization,      # KABPersonOrganizationProperty
-        11 => :department,        # KABPersonDepartmentProperty
-        14 => :note,              # KABPersonNoteProperty
-        17 => :birthday,          # KABPersonBirthdayProperty
-        18 => :job_title,         # KABPersonJobTitleProperty
-        19 => :nickname,          # KABPersonNicknameProperty
-        20 => :prefix,            # KABPersonPrefixProperty
-        21 => :suffix,            # KABPersonSuffixProperty
-        26 => :creation_date,     # KABPersonCreationDateProperty
-        27 => :modification_date  # KABPersonModificationDateProperty
+        10 => :organization,     # KABPersonOrganizationProperty
+        11 => :department,       # KABPersonDepartmentProperty
+        14 => :note,             # KABPersonNoteProperty
+        17 => :birthday,         # KABPersonBirthdayProperty
+        18 => :job_title,        # KABPersonJobTitleProperty
+        19 => :nickname,         # KABPersonNicknameProperty
+        20 => :prefix,           # KABPersonPrefixProperty
+        21 => :suffix,           # KABPersonSuffixProperty
+        26 => :creation_date,    # KABPersonCreationDateProperty
+        27 => :modification_date # KABPersonModificationDateProperty
       }
       TYPE_MAP = {
         0 => :person,       # KABPersonKindPerson
@@ -99,12 +99,26 @@ module AddressBook
         self
       end
 
-      def persisted?
-        uid != KABRecordInvalidID
+      def matches?(conditions)
+        conditions.keys.all? do |attribute|
+          required_value = conditions[attribute]
+
+          case attribute
+          when :email, :phone
+            send("#{attribute}s".to_sym).map { |record| record[:value] }
+              .any? { |value| value == required_value }
+          else
+            send(attribute) == required_value
+          end
+        end
       end
 
       def organization?
         type == :organization
+      end
+
+      def persisted?
+        uid != KABRecordInvalidID
       end
 
       def person?
