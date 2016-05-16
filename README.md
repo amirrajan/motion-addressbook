@@ -8,8 +8,14 @@
 A RubyMotion wrapper around the iOS and OSX Address Book frameworks for
 RubyMotion apps.
 
-Apple's Address Book Programming Guide for [iOS][ios-docs-link]
-or for [OSX][mac-docs-link]
+Relevant Apple Docs:
+
+| OS | Framework |
+|----|-----------|
+| iOS 6-8 | [ABAddressBook][ios-ab-docs-link] |
+| iOS 9+ | [CNContact][ios-cn-docs-link] |
+| OSX 10.2-10.10 | [ABAddressBook][mac-ab-docs-link] |
+| OSX 10.11+ | [CNContact][mac-cn-docs-link] |
 
 ## Requirements
 
@@ -256,5 +262,7 @@ notifications.
 [gem-version-image]: https://img.shields.io/gem/v/motion-addressbook.svg?maxAge=2592000
 [dependencies-link]: https://gemnasium.com/github.com/jbender/motion-addressbook
 [dependencies-image]: https://img.shields.io/gemnasium/jbender/motion-addressbook.svg?maxAge=2592000
-[ios-docs-link]: https://developer.apple.com/library/ios/documentation/AddressBook/Reference/AddressBook_iPhoneOS_Framework/index.html#//apple_ref/doc/uid/TP40007212
-[mac-docs-link]: https://developer.apple.com/library/mac/documentation/UserExperience/Reference/AddressBook/ObjC_classic/index.html#//apple_ref/doc/uid/20001692
+[ios-ab-docs-link]: https://developer.apple.com/library/ios/documentation/AddressBook/Reference/AddressBook_iPhoneOS_Framework/index.html#//apple_ref/doc/uid/TP40007212
+[ios-cn-docs-link]: https://developer.apple.com/library/ios/documentation/Contacts/Reference/Contacts_Framework/index.html#//apple_ref/doc/uid/TP40015328
+[mac-ab-docs-link]: https://developer.apple.com/library/mac/documentation/UserExperience/Reference/AddressBook/ObjC_classic/index.html#//apple_ref/doc/uid/20001692
+[mac-cn-docs-link]: https://developer.apple.com/library/mac/documentation/Contacts/Reference/Contacts_Framework/index.html#//apple_ref/doc/uid/TP40015328
