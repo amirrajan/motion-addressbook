@@ -3,8 +3,8 @@ module AddressBook
     attr_accessor :auto_connect
 
     def instance
-      Dispatch.once { @address_book ||= address_book(auto_connect) }
-      @address_book
+      Dispatch.once { @contact_accessor ||= contact_accessor(auto_connect) }
+      @contact_accessor
     end
 
     def respond_to?(method_name, include_private = false)
@@ -33,27 +33,25 @@ module AddressBook
 
     private
 
-    def address_book(autoconnect)
+    def contact_accessor(autoconnect)
       # OSX
       return ABAddressBook.addressBook if Kernel.const_defined? :NSApplication
 
       # iOS
-      return unless address_book_class.respond_to? :new
-
-      address_book_class.new(autoconnect)
+      contact_accessor.new(autoconnect)
     end
 
-    def address_book_class
-      case AddressBook.framework_as_sym
+    def contact_accessor
+      case framework_as_sym
       when :ab then AB::AddressBook
-      when :cn then nil
+      when :cn then CN::ContactStore
       end
     end
 
     def auth_handler
       case framework_as_sym
       when :ab then AB::Authorization
-      when :cn then nil
+      when :cn then CN::Authorization
       end
     end
 

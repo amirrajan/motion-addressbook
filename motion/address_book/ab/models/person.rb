@@ -15,9 +15,9 @@ module AddressBook
         0 => :first_name,  # KABPersonFirstNameProperty
         1 => :last_name,   # KABPersonLastNameProperty
         6 => :middle_name, # KABPersonMiddleNameProperty
-        # undefined => :first_name_phonetic,  # KABPersonFirstNamePhoneticProperty
-        # undefined => :last_name_phonetic,   # KABPersonLastNamePhoneticProperty
-        # undefined => :middle_name_phonetic, # KABPersonMiddleNamePhoneticProperty
+        # n/a => :first_name_phonetic,  # KABPersonFirstNamePhoneticProperty
+        # n/a => :last_name_phonetic,   # KABPersonLastNamePhoneticProperty
+        # n/a => :middle_name_phonetic, # KABPersonMiddleNamePhoneticProperty
         10 => :organization,     # KABPersonOrganizationProperty
         11 => :department,       # KABPersonDepartmentProperty
         14 => :note,             # KABPersonNoteProperty
@@ -30,8 +30,8 @@ module AddressBook
         27 => :modification_date # KABPersonModificationDateProperty
       }
       TYPE_MAP = {
-        0 => :person,       # KABPersonKindPerson
-        1 => :organization  # KABPersonKindOrganization
+        0 => :person,      # KABPersonKindPerson
+        1 => :organization # KABPersonKindOrganization
       }
       ALL_PROPERTIES = PROPERTY_MAP.merge(MULTI_VALUE_PROPERTY_MAP)
 

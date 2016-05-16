@@ -14,7 +14,7 @@ Motion::Project::App.setup do |app|
     # We have an iOS project
     # Added as weak in case the app.deployment_target < 9
     app.weak_frameworks += ['Contacts', 'ContactsUI']
-    app.files.unshift(Dir.glob(File.join(project_path, "/cn/**.rb")))
+    app.files.unshift(Dir.glob(File.join(project_path, "/cn/**/*.rb")))
 
     app.frameworks += ['AddressBook', 'AddressBookUI']
     app.files.unshift(Dir.glob(File.join(project_path, "/ab/**/*.rb")))
