@@ -14,7 +14,7 @@ module AddressBook
         end
 
         def request(&callback)
-          CNContactStore.requestAccessForEntityType(CNEntityTypeContacts,
+          instance.requestAccessForEntityType(CNEntityTypeContacts,
             completionHandler: callback
           )
         end
@@ -24,6 +24,10 @@ module AddressBook
         end
 
         private
+
+        def instance
+          @instance ||= CNContactStore.new
+        end
 
         def status_for_type(entity_type)
           CNContactStore.authorizationStatusForEntityType entity_type

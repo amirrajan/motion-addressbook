@@ -2,15 +2,14 @@ module AddressBook
   module CN
     module Accessors
 
-      module Contact
+      module Contacts
         class << self
-          def index
-            error = nil
-            contacts = []
-            ContactStore.new_connection.enumerateContactsWithFetchRequest(
+          def index(connection)
+            contacts, error = [[], nil]
+            connection.enumerateContactsWithFetchRequest(
               fetch_request,
               error: error,
-              usingBlock: proc { |contact, stop| contacts << contact }
+              usingBlock: proc { |contact, _stop| contacts << contact }
             )
             error ? raise(error) : contacts
           end

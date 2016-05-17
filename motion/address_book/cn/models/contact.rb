@@ -1,6 +1,10 @@
 module AddressBook
   module CN
     class Contact
+      include AddressBook::Shared::Hashable
+
+      INITIALIZATION_ERROR =
+        "Contact must be initialized with an CNContact or Hash"
       # NOTE: These values don't come through via the REPL, you have to open up
       #   an Xcode playground to get them.
       PROPERTY_MAP = {
@@ -31,43 +35,63 @@ module AddressBook
         "postalAddresses"         => :addresses,       # CNContactPostalAddressesKey
         "dates"                   => :dates,           # CNContactDatesKey
         "urlAddresses"            => :urls,            # CNContactUrlAddressesKey
-        "contactRelations"        => :relationsh,      # CNContactRelationsKey
+        "contactRelations"        => :relations,       # CNContactRelationsKey
         "socialProfiles"          => :social_profiles, # CNContactSocialProfilesKey
         "instantMessageAddresses" => :im_profiles      # CNContactInstantMessageAddressesKey
       }
+      TYPE_MAP = {
+        0 => :person,      # CNContactTypePerson
+        1 => :organization # CNContactTypeOrganization
+      }
 
-      attr_accessor(
-        # Single-values
-        :prefix,
-        :first_name,
-        :middle_name,
-        :last_name,
-        :maiden_name,
-        :suffix,
-        :nickname,
-        :first_name_phonetic,
-        :last_name_phonetic,
-        :middle_name_phonetic,
-        :organization,
-        :department,
-        :job_title,
-        :birthday,
-        :non_gregorian_birthday,
-        :note,
-        :image,
-        :thumbnail_image,
-        :image_available,
-        :contact_type,
-        # Multi-values
-        :phones,
-        :emails,
-        :addresses,
-        :dates,
-        :urls,
-        :relationsh,
-        :social_profiles,
-        :im_profiles
-      )
+      attr_accessor(*PROPERTY_MAP.values)
+
+      def initialize(hash_or_record)
+        if hash_or_record.is_a?(CNContact) then parse_record!(hash_or_record)
+        elsif hash_or_record.is_a?(Hash) then parse_hash!(hash_or_record)
+        else raise(ArugmentError, INITIALIZATION_ERROR)
+        end
+
+        self
+      end
+
+      def to_s
+        "#<#{self.class}:#{uid}: #{attributes}>"
+      end
+      alias :inspect :to_s
+
+      def uid
+        return unless @record_ref
+        @record_ref.identifier
+      end
+
+      private
+
+      def parse_record!(cn_contact)
+        @record_reference = cn_contact
+
+        @type = TYPE_MAP[@record_reference.contactType]
+
+        PROPERTY_MAP.each do |cn_field, attribute|
+          record_property = cn_contact.send(cn_field.to_sym)
+          next unless record_property
+          instance_variable_set("@#{attribute}".to_sym, record_property)
+        end
+
+        self
+      end
+
+      def parse_hash!(hash)
+        record_reference # Initializes a new record
+
+        @type = TYPE_MAP.invert[hash[:type]]
+
+        PROPERTY_MAP.each do |_cn_field, attribute|
+          instance_variable_set("@#{attribute}".to_sym, hash[attribute])
+        end
+
+        self
+      end
     end
   end
 end

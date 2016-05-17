@@ -1,6 +1,8 @@
 module AddressBook
   module AB
     class Person
+      include AddressBook::Shared::Hashable
+
       MULTI_VALUE_PROPERTY_MAP = {
         3 => :phones,          # KABPersonPhoneProperty
         4 => :emails,          # KABPersonEmailProperty
@@ -79,16 +81,6 @@ module AddressBook
         self
       end
 
-      def attributes
-        response = {}
-        instance_variables.each do |var|
-          response[variable_as_sym(var)] = instance_variable_get(var)
-        end
-        response
-      end
-      alias :to_h :attributes
-      alias :to_hash :to_h
-
       def delete!
         raise "Cannot delete non-persisted record" unless persisted?
 
@@ -128,6 +120,7 @@ module AddressBook
       def save!
         if persisted?
           instance_variables.each do |variable|
+            key = Shared::Utilities.variable_as_sym(var)
             variable_sym = variable_as_sym(variable)
             ab_field = ALL_PROPERTIES.invert[variable_sym]
             next unless ab_field
@@ -229,10 +222,6 @@ module AddressBook
 
       def single_valued_field?(ab_field)
         PROPERTY_MAP.keys.include? ab_field
-      end
-
-      def variable_as_sym(variable)
-        variable.to_s.gsub(/^@/, '').to_sym
       end
     end
   end

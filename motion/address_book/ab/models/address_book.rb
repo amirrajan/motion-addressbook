@@ -5,25 +5,26 @@ module AddressBook
       #   request access on creation
       def initialize(auto_connect = true)
         connect if auto_connect
+        self
       end
 
-      def connect
-        return @connection if connected?
+      def connect(&after_connect)
+        if connected?
+          return (after_connect.nil? ? @native_ref : after_connect.call)
+        end
 
         if Authorization.granted?
-          options, error = [nil, nil]
-          @connection = ABAddressBookCreateWithOptions(options, error)
-        else
-          Authorization.request(@connection) do |success, error|
-            NSLog("AddressBook: access was #{success ? 'approved' : 'denied'}")
-          end
+          Accessors::AddressBook.new(@native_ref)
+          return after_connect.call
         end
+
+        request_authorization { |success, error| after_connect.call if success }
       end
 
-      # If set, @connection will be a __NSCFType, which, unfortunately, is not
+      # If set, @native_ref will be a __NSCFType, which, unfortunately, is not
       # something you can easily query for, so we check the pointer description
       def connected?
-        Utilities.address_book?(@connection)
+        Utilities.address_book?(@native_ref)
       end
 
       # @param block [Proc] will receive one boolean argument indicating whether
@@ -32,18 +33,18 @@ module AddressBook
       def request_authorization(&block)
         synchronous = !block
 
-        Authorization.request(@connection) do |granted, error|
+        Authorization.request(@native_ref) do |granted, error|
           NSLog "%@", granted
           NSLog "%@", error
           # not sure what to do with error ... so we're ignoring it
-          @address_book_access_granted = granted
-          block.call(@address_book_access_granted) unless block.nil?
+          @access_granted = granted
+          block.call(@access_granted) unless block.nil?
         end
 
         # Wait on the asynchronous callback before returning.
-        while(synchronous && @address_book_access_granted.nil?) do sleep 0.1 end
+        while(synchronous && @access_granted.nil?) do sleep 0.1 end
 
-        @address_book_access_granted
+        @access_granted
       end
 
       # Will ensure that changes to the address book are emitted via the
@@ -66,30 +67,18 @@ module AddressBook
       #
       # App.notification_center.observe(:addressbook_updated, &my_callback)
       def notify_on_changes!
-        ensure_connection!
-
-        @notifier = Proc.new do |_ab_instance, _always_nil, _context|
-          NSNotificationCenter.defaultCenter.postNotificationName(
-            :addressbook_updated,
-            object: self,
-            userInfo: nil
-          )
-        end
-
-        register_callback(@notifier)
+        ensure_connection! { register_callback(notifier) }
       end
 
       def register_callback(callback)
-        ABAddressBookRegisterExternalChangeCallback(@connection, callback, nil)
+        Accessors::AddressBook.register_callback(@native_ref, callback)
       end
 
       # @param callback [Proc] will receive 3 arguments on changes to the
-      #   address book, the @connection that was changed, a nil value, and the
+      #   address book, the @native_ref that was changed, a nil value, and the
       #   context
       def track_changes(&callback)
-        ensure_connection!
-
-        register_callback(callback)
+        ensure_connection! { register_callback(callback) }
       end
 
       ###############
@@ -99,102 +88,99 @@ module AddressBook
       # Groups
 
       def groups
-        ensure_connection!
-
-        Accessors::Groups.index(@connection).map { |group| group_new(group) }
+        ensure_connection! do
+          Accessors::Groups.index(@native_ref).map { |group| group_new(group) }
+        end
       end
 
       def groups_count
-        ensure_connection!
-
-        Accessors::Groups.count(@connection)
+        ensure_connection! { Accessors::Groups.count(@native_ref) }
       end
 
       def group_new(attributes)
-        ensure_connection!
-
-        Group.new(attributes, @connection)
+        ensure_connection! { Group.new(attributes, @native_ref) }
       end
 
       def group_create(attributes)
-        ensure_connection!
-
-        group_new(attributes).save
+        ensure_connection! { group_new(attributes).save }
       end
 
       def group_find(id)
-        ensure_connection!
-
-        ab_group = Accessors::Groups.find(@connection, id)
-        ab_group && group_new(ab_group)
+        ensure_connection! do
+          ab_group = Accessors::Groups.find(@native_ref, id)
+          ab_group && group_new(ab_group)
+        end
       end
 
       # People
 
       def people(options = {})
-        ensure_connection!
-
-        Accessors::People.index(@connection, options)
-          .map { |ab_person| person_new(ab_person) }
+        ensure_connection! do
+          Accessors::People.index(@native_ref, options)
+            .map { |ab_person| person_new(ab_person) }
+        end
       end
       alias :contacts :people
 
       def people_changed_since(timestamp)
-        ensure_connection!
-
-        Accessors::People.changed_since(@connection, timestamp)
+        ensure_connection! do
+          Accessors::People.changed_since(@native_ref, timestamp)
+        end
       end
       alias :contacts_changed_since :people_changed_since
 
       def people_count
-        ensure_connection!
-
-        Accessors::People.count(@connection)
+        ensure_connection! { Accessors::People.count(@native_ref) }
       end
       alias :contacts_count :people_count
 
       def people_where(conditions)
-        ensure_connection!
-
-        people.select { |person| person.matches? conditions }
+        ensure_connection! do
+          people.select { |person| person.matches? conditions }
+        end
       end
       alias :contacts_where :people_where
 
       def person_new(attributes)
-        ensure_connection!
-
-        Person.new(attributes, @connection)
+        ensure_connection! { Person.new(attributes, @native_ref) }
       end
       alias :contact_new :person_new
 
       def person_create(attributes)
-        ensure_connection!
-
-        person_new(attributes).save
+        ensure_connection! { person_new(attributes).save }
       end
       alias :contact_create :person_create
 
       def person_find(id)
-        ensure_connection!
-
-        ab_person = Accessors::People.find(@connection, id)
-        ab_person && person_new(ab_person)
+        ensure_connection! do
+          ab_person = Accessors::People.find(@native_ref, id)
+          ab_person && person_new(ab_person)
+        end
       end
       alias :contact_find :person_find
 
       # Sources
 
       def sources
-        ensure_connection!
-
-        Accessors::Sources.index(@connection).map { |s| Source.new(s) }
+        ensure_connection! do
+          Accessors::Sources.index(@native_ref).map { |s| Source.new(s) }
+        end
       end
 
       private
 
       def ensure_connection!
-        return if connected? && Authorization.granted?
-        raise "AddressBook must be created and authorized"
+        connected? ? after_connect.call : connect(&after_connect)
+      end
+
+      def notifier
+        @notifier ||= Proc.new do |_ab_instance, _always_nil, _context|
+          NSNotificationCenter.defaultCenter.postNotificationName(
+            :addressbook_updated,
+            object: self,
+            userInfo: nil
+          )
+        end
       end
     end
   end

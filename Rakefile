@@ -23,6 +23,8 @@ Motion::Project::App.setup do |app|
   end
 end
 
+require "newclear" # Access needs to be blown away periodically
+
 # The test suite may interfere with contacts already created in the
 # simulator.  In order to avoid disrupting anything the existing
 # simulator environment, run the test suite in its own blank simulator
