@@ -195,7 +195,7 @@ module AddressBook
       end
 
       def record_reference
-        @record_reference ||= ABPersonCreate()
+        @record_reference ||= Accessors::People.new_record
       end
 
       def remove_field(ab_field)

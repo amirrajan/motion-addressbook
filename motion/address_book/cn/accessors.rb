@@ -14,11 +14,15 @@ module AddressBook
             error ? raise(error) : contacts
           end
 
+          def new_record
+            CNMutableContact()
+          end
+
           private
 
           def fetch_request
             CNContactFetchRequest.alloc.initWithKeysToFetch(
-              CN::Contact::PROPERTY_MAP.keys
+              CN::Contact::ALL_PROPERTIES.keys
             )
           end
         end
@@ -34,6 +38,14 @@ module AddressBook
 
           def new_connection
             CNContactStore.new
+          end
+        end
+      end
+
+      module LabeledValue
+        class << self
+          def new(label, value)
+            CNLabeledValue.initWithLabel(label, value: value)
           end
         end
       end

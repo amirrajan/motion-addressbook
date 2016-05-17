@@ -81,7 +81,7 @@ module AddressBook
           ABMultiValueGetPropertyType(record_reference)
         end
 
-        def new(property_type)
+        def new_record(property_type)
           ABMultiValueCreateMutable(property_type)
         end
       end
@@ -132,6 +132,10 @@ module AddressBook
 
           all_from_source(connection, options[:source])
             .sort { |a, b| ABPersonComparePeopleByName(a, b, ordering) }
+        end
+
+        def new_record
+          ABPersonCreate()
         end
 
         def remove_field(record_reference, field)

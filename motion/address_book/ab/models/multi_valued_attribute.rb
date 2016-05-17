@@ -1,35 +1,37 @@
 module AddressBook
   module AB
     class MultiValuedAttribute
+      INITIALIZATION_ERROR =
+        "MultiValuedAttribute must be initialized with an ABMultiValue or Hash"
       LABEL_MAP = {
-        "mobile" => KABPersonPhoneMobileLabel,
-        "iphone" => KABPersonPhoneIPhoneLabel,
-        "main" => KABPersonPhoneMainLabel,
-        "home_fax" => KABPersonPhoneHomeFAXLabel,
-        "work_fax" => KABPersonPhoneWorkFAXLabel,
-        "pager" => KABPersonPhonePagerLabel,
-        "work" => KABWorkLabel,
-        "home" => KABHomeLabel,
-        "other" => KABOtherLabel,
-        "home page" => KABPersonHomePageLabel,
-        "anniversary" => KABPersonAnniversaryLabel
+        :mobile      => KABPersonPhoneMobileLabel,
+        :iphone      => KABPersonPhoneIPhoneLabel,
+        :main        => KABPersonPhoneMainLabel,
+        :home_fax    => KABPersonPhoneHomeFAXLabel,
+        :work_fax    => KABPersonPhoneWorkFAXLabel,
+        :pager       => KABPersonPhonePagerLabel,
+        :work        => KABWorkLabel,
+        :home        => KABHomeLabel,
+        :other       => KABOtherLabel,
+        :home_page   => KABPersonHomePageLabel,
+        :anniversary => KABPersonAnniversaryLabel
       }
       PROPERTY_MAP = {
-        "Street" => :street,            # KABPersonAddressStreetKey
-        "City" => :city,                # KABPersonAddressCityKey
-        "State" => :state,              # KABPersonAddressStateKey
-        "ZIP" => :postalcode,           # KABPersonAddressZIPKey
-        "Country" => :country,          # KABPersonAddressCountryKey
-        "CountryCode" => :country_code, # KABPersonAddressCountryCodeKey
+        KABPersonAddressStreetKey => :street,
+        KABPersonAddressCityKey => :city,
+        KABPersonAddressStateKey => :state,
+        KABPersonAddressZIPKey => :postalcode,
+        KABPersonAddressCountryKey => :country,
+        KABPersonAddressCountryCodeKey => :country_code,
 
-        "service" => :service,   # KABPersonSocialProfileServiceKey
-        "url" => :url,           # KABPersonSocialProfileURLKey
-        "username" => :username, # KABPersonSocialProfileUsernameKey
-        "identifier" => :userid, # KABPersonSocialProfileUserIdentifierKey
+        KABPersonSocialProfileServiceKey => :service,
+        KABPersonSocialProfileURLKey => :url,
+        KABPersonSocialProfileUsernameKey => :username,
+        KABPersonSocialProfileUserIdentifierKey => :userid,
 
         # these keys are identical to the SocialProfile keys above
-        "service" => :service,  # KABPersonInstantMessageServiceKey
-        "username" => :username # KABPersonInstantMessageUsernameKey
+        KABPersonInstantMessageServiceKey => :service,
+        KABPersonInstantMessageUsernameKey => :username
       }
 
       def initialize(value_array_or_record)
@@ -41,9 +43,7 @@ module AddressBook
         elsif value_array_or_record.is_a?(Array)
           parse_value_array!(value_array_or_record)
         else
-          raise ArugmentError,
-            "MultiValuedAttribute must be initialized with an ABMultiValue " \
-            "or Hash"
+          raise(ArugmentError, INITIALIZATION_ERROR)
         end
 
         self
@@ -54,8 +54,8 @@ module AddressBook
       end
 
       # @param value_hash [Hash] Should include something like this:
-      #   { value: "My String", label: "main" }
-      #   { date: NSDate, label: "anniversary" }
+      #   { value: "My String", label: :main }
+      #   { date: NSDate, label: :anniversary }
       def add_value_hash(value_hash)
         add_value_with_label(
           value_from_hash(value_hash),
@@ -69,7 +69,6 @@ module AddressBook
       end
 
       def property_type
-
         if attribute_reference then Accessors::MultiValue.property_type(attribute_reference)
         elsif values.find { |rec| rec[:value] } then KABMultiStringPropertyType
         elsif values.find { |rec| rec[:date] } then KABMultiDateTimePropertyType
@@ -103,9 +102,9 @@ module AddressBook
         ab_record.empty? ? nil : ab_record
       end
 
+      # Assumes that the label has already been localized
       def add_value_with_label(value, label)
-        Accessors::MultiValue
-          .append(attribute_reference, value, localized_label(label))
+        Accessors::MultiValue.append(attribute_reference, value, label)
       end
 
       def attribute_reference
@@ -113,7 +112,6 @@ module AddressBook
       end
 
       def hash_from_ab_index(index)
-
         case property_type
         when KABStringPropertyType # 1
           { value: value_at_index(index) }
@@ -144,8 +142,8 @@ module AddressBook
         hash.merge(label: label)
       end
 
-      def localized_label(str)
-        LABEL_MAP[str] || str
+      def localized_label(symbol)
+        LABEL_MAP[symbol] || symbol.to_s
       end
 
       def parse_value_array!(value_array)
@@ -181,7 +179,7 @@ module AddressBook
       end
 
       def attribute_reference
-        @attribute_reference ||= Accessors::MultiValue.new(property_type)
+        @attribute_reference ||= Accessors::MultiValue.new_record(property_type)
       end
     end
   end
