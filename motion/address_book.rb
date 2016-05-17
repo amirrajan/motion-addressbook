@@ -55,3 +55,4 @@ module AddressBook
     end
   end
 end
+::Contacts = AddressBook unless defined?(::Contacts)
