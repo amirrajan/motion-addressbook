@@ -4,7 +4,10 @@ module AddressBook
       def attributes
         response = {}
         instance_variables.each do |var|
-          response[variable_as_sym(var)] = instance_variable_get(var)
+          var_val = instance_variable_get(var)
+
+          response[variable_as_sym(var)] =
+            var_val.respond_to?(:to_h) ? var_val.to_h : var_val
         end
         response
       end
