@@ -44,8 +44,46 @@ module AddressBook
 
       module LabeledValue
         class << self
-          def new(label, value)
-            CNLabeledValue.initWithLabel(label, value: value)
+          def new_address(label, value_object)
+            address = CNPostalAddress.alloc.init
+            value_object.each do |key, value|
+              new_value = value || "" # Empty string clears the value
+              address.send("#{key}=", new_value)
+            end
+            CNLabeledValue.initWithLabel(label, value: address)
+          end
+
+          def new_im_address(label, value_object)
+            im_address = CNInstantMessageAddress.initWithUsername(
+              value_object[:username],
+              service: value_object[:service]
+            )
+            CNLabeledValue.initWithLabel(label, value: im_address)
+          end
+
+          def new_phone(label, value_object)
+            phone = CNPhoneNumber.initWithStringValue(value_object[:number])
+            CNLabeledValue.initWithLabel(label, value: phone)
+          end
+
+          def new_relation(label, value_object)
+            relation = CNContactRelation.initWithName(value_object[:name])
+            CNLabeledValue.initWithLabel(label, value: relation)
+          end
+
+          def new_social_profile(label, value_object)
+            social_profile = CNSocialProfile.initWithUrlString(
+              value_object[:urlString],
+              username: value_object[:username],
+              userIdentifier: value_object[:userIdentifier],
+              service: value_object[:service],
+              displayname: nil
+            )
+            CNLabeledValue.initWithLabel(label, value: social_profile)
+          end
+
+          def new_value(label, value_object)
+            CNLabeledValue.initWithLabel(label, value: value_object[:value])
           end
         end
       end
