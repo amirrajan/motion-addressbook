@@ -12,7 +12,9 @@ module AddressBook
           return (after_connect.nil? ? @native_ref : after_connect.call)
         end
 
-        request_authorization { |success, error| after_connect.call if success }
+        request_authorization do |success, error|
+          after_connect.call if success && after_connect
+        end
       end
 
       def connected?
@@ -26,9 +28,7 @@ module AddressBook
         synchronous = !block
 
         Authorization.request do |granted, error|
-          NSLog "%@", granted
-          NSLog "%@", error
-          # not sure what to do with error ... so we're ignoring it
+          raise(error) if !granted && error
           @access_granted = granted
           block.call(@access_granted) unless block.nil?
         end

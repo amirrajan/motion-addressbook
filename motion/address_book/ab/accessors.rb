@@ -9,10 +9,11 @@ module AddressBook
           ABAddressBookCopyLocalizedLabel(label_reference)
         end
 
-        def new_connection(record_reference)
+        def new_connection
           options, error = [nil, nil]
           record_reference = ABAddressBookCreateWithOptions(options, error)
           raise(error) if error
+          record_reference
         end
 
         def register_callback(record_reference, callback)
