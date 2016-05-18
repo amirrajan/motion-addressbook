@@ -3,36 +3,42 @@ module AddressBook
     class MultiValuedAttribute
       INITIALIZATION_ERROR =
         "MultiValuedAttribute must be initialized with an ABMultiValue or Hash"
-      LABEL_MAP = {
-        :mobile      => KABPersonPhoneMobileLabel,
-        :iphone      => KABPersonPhoneIPhoneLabel,
-        :main        => KABPersonPhoneMainLabel,
-        :home_fax    => KABPersonPhoneHomeFAXLabel,
-        :work_fax    => KABPersonPhoneWorkFAXLabel,
-        :pager       => KABPersonPhonePagerLabel,
-        :work        => KABWorkLabel,
-        :home        => KABHomeLabel,
-        :other       => KABOtherLabel,
-        :home_page   => KABPersonHomePageLabel,
-        :anniversary => KABPersonAnniversaryLabel
-      }
-      PROPERTY_MAP = {
-        KABPersonAddressStreetKey => :street,
-        KABPersonAddressCityKey => :city,
-        KABPersonAddressStateKey => :state,
-        KABPersonAddressZIPKey => :postalcode,
-        KABPersonAddressCountryKey => :country,
-        KABPersonAddressCountryCodeKey => :country_code,
 
-        KABPersonSocialProfileServiceKey => :service,
-        KABPersonSocialProfileURLKey => :url,
-        KABPersonSocialProfileUsernameKey => :username,
-        KABPersonSocialProfileUserIdentifierKey => :userid,
+      def self.LABEL_MAP
+        {
+          :mobile      => KABPersonPhoneMobileLabel,
+          :iphone      => KABPersonPhoneIPhoneLabel,
+          :main        => KABPersonPhoneMainLabel,
+          :home_fax    => KABPersonPhoneHomeFAXLabel,
+          :work_fax    => KABPersonPhoneWorkFAXLabel,
+          :pager       => KABPersonPhonePagerLabel,
+          :work        => KABWorkLabel,
+          :home        => KABHomeLabel,
+          :other       => KABOtherLabel,
+          :home_page   => KABPersonHomePageLabel,
+          :anniversary => KABPersonAnniversaryLabel
+        }
+      end
 
-        # these keys are identical to the SocialProfile keys above
-        KABPersonInstantMessageServiceKey => :service,
-        KABPersonInstantMessageUsernameKey => :username
-      }
+      def self.PROPERTY_MAP
+        {
+          KABPersonAddressStreetKey => :street,
+          KABPersonAddressCityKey => :city,
+          KABPersonAddressStateKey => :state,
+          KABPersonAddressZIPKey => :postalcode,
+          KABPersonAddressCountryKey => :country,
+          KABPersonAddressCountryCodeKey => :country_code,
+
+          KABPersonSocialProfileServiceKey => :service,
+          KABPersonSocialProfileURLKey => :url,
+          KABPersonSocialProfileUsernameKey => :username,
+          KABPersonSocialProfileUserIdentifierKey => :userid,
+
+          # these keys are identical to the SocialProfile keys above
+          KABPersonInstantMessageServiceKey => :service,
+          KABPersonInstantMessageUsernameKey => :username
+        }
+      end
 
       def initialize(value_array_or_record)
         @values = []
@@ -96,7 +102,7 @@ module AddressBook
 
       def ab_dictionary_from_hash(hash)
         ab_record = {}
-        PROPERTY_MAP.each do |ab_key, ruby_key|
+        self.class.PROPERTY_MAP.each do |ab_key, ruby_key|
           ab_record[ab_key] = hash[ruby_key] if hash[ruby_key]
         end
         ab_record.empty? ? nil : ab_record
@@ -126,7 +132,7 @@ module AddressBook
 
       def hash_from_ab_dictionary(dictionary)
         hash = {}
-        PROPERTY_MAP.each do |ab_key, attr_key|
+        self.class.PROPERTY_MAP.each do |ab_key, attr_key|
           hash[attr_key] = dictionary[ab_key] if dictionary[ab_key]
         end
         hash.empty? ? nil : hash
@@ -137,13 +143,13 @@ module AddressBook
       end
 
       def labeled_hash_at_index(index)
-        label = LABEL_MAP.invert[label_at_index(index)]
+        label = self.class.LABEL_MAP.invert[label_at_index(index)]
         hash = hash_from_ab_index(index)
         hash.merge(label: label)
       end
 
       def localized_label(symbol)
-        LABEL_MAP[symbol] || symbol.to_s
+        self.class.LABEL_MAP[symbol] || symbol.to_s
       end
 
       def parse_value_array!(value_array)
