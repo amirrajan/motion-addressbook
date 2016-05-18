@@ -114,7 +114,7 @@ module AddressBook
       end
 
       def record_reference
-        @record_reference ||= Accessors::Contact.new_record
+        @record_reference ||= Accessors::Contacts.new_record
       end
 
       def single_valued_field?(cn_field)
