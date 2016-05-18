@@ -14,7 +14,7 @@ module AddressBook
         end
 
         if Authorization.granted?
-          Accessors::AddressBook.new(@native_ref)
+          Accessors::AddressBook.new_connection(@native_ref)
           return after_connect.call
         end
 
@@ -169,7 +169,7 @@ module AddressBook
 
       private
 
-      def ensure_connection!
+      def ensure_connection!(&after_connect)
         connected? ? after_connect.call : connect(&after_connect)
       end
 
