@@ -22,7 +22,7 @@ module AddressBook
 
           def fetch_request
             CNContactFetchRequest.alloc.initWithKeysToFetch(
-              CN::Contact::ALL_PROPERTIES.keys
+              CN::Contact.ALL_PROPERTIES.keys
             )
           end
         end
@@ -38,6 +38,10 @@ module AddressBook
 
           def new_connection
             CNContactStore.new
+          end
+
+          def status_for_type(entity_type)
+            CNContactStore.authorizationStatusForEntityType entity_type
           end
         end
       end

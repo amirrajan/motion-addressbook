@@ -9,40 +9,43 @@ module AddressBook
         :simple,
         :social_profile
       ]
-      LABEL_MAP = {
-        # Generic Labels
-        :work  => CNLabelWork,
-        :home  => CNLabelHome,
-        :other => CNLabelOther,
-        # Email Labels
-        :icloud => CNLabelEmailiCloud,
-        # URL Labels
-        :home_page => CNLabelURLAddressHomePage,
-        # Date Labels
-        :anniversary => CNLabelDateAnniversary,
-        # Phone Number Labels
-        :mobile    => CNLabelPhoneNumberMobile,
-        :iphone    => CNLabelPhoneNumberiPhone,
-        :main      => CNLabelPhoneNumberMain,
-        :home_fax  => CNLabelPhoneNumberHomeFax,
-        :work_fax  => CNLabelPhoneNumberWorkFax,
-        :other_fax => CNLabelPhoneNumberOtherFax,
-        :pager     => CNLabelPhoneNumberPager,
-        # Relation Labels
-        :father    => CNLabelContactRelationFather,
-        :mother    => CNLabelContactRelationMother,
-        :parent    => CNLabelContactRelationParent,
-        :brother   => CNLabelContactRelationBrother,
-        :sister    => CNLabelContactRelationSister,
-        :child     => CNLabelContactRelationChild,
-        :friend    => CNLabelContactRelationFriend,
-        :spouse    => CNLabelContactRelationSpouse,
-        :partner   => CNLabelContactRelationPartner,
-        :assistant => CNLabelContactRelationAssistant,
-        :manager   => CNLabelContactRelationManager
-      }
       INITIALIZATION_ERROR =
         "LabeledValue must be initialized with an CNLabeledValue or Hash"
+
+      def self.LABEL_MAP
+        {
+          # Generic Labels
+          :work  => CNLabelWork,
+          :home  => CNLabelHome,
+          :other => CNLabelOther,
+          # Email Labels
+          :icloud => CNLabelEmailiCloud,
+          # URL Labels
+          :home_page => CNLabelURLAddressHomePage,
+          # Date Labels
+          :anniversary => CNLabelDateAnniversary,
+          # Phone Number Labels
+          :mobile    => CNLabelPhoneNumberMobile,
+          :iphone    => CNLabelPhoneNumberiPhone,
+          :main      => CNLabelPhoneNumberMain,
+          :home_fax  => CNLabelPhoneNumberHomeFax,
+          :work_fax  => CNLabelPhoneNumberWorkFax,
+          :other_fax => CNLabelPhoneNumberOtherFax,
+          :pager     => CNLabelPhoneNumberPager,
+          # Relation Labels
+          :father    => CNLabelContactRelationFather,
+          :mother    => CNLabelContactRelationMother,
+          :parent    => CNLabelContactRelationParent,
+          :brother   => CNLabelContactRelationBrother,
+          :sister    => CNLabelContactRelationSister,
+          :child     => CNLabelContactRelationChild,
+          :friend    => CNLabelContactRelationFriend,
+          :spouse    => CNLabelContactRelationSpouse,
+          :partner   => CNLabelContactRelationPartner,
+          :assistant => CNLabelContactRelationAssistant,
+          :manager   => CNLabelContactRelationManager
+        }
+      end
 
       attr_reader(
         :label,
@@ -64,7 +67,7 @@ module AddressBook
 
       def label=(new_value)
         @label = new_value
-        @native_ref.label = LABEL_MAP[new_value]
+        @native_ref.label = self.class.LABEL_MAP[new_value]
       end
 
       def value=(new_value)
@@ -107,12 +110,12 @@ module AddressBook
       end
 
       def localized_label(str)
-        LABEL_MAP[str] || str
+        self.class.LABEL_MAP[str] || str
       end
 
       def parse_record!(cn_record)
         @native_ref = cn_record
-        @label = LABEL_MAP.invert[cn_record.label]
+        @label = self.class.LABEL_MAP.invert[cn_record.label]
         parse_record_value!(cn_record.value)
       end
 
@@ -153,7 +156,7 @@ module AddressBook
 
       def parse_hash!(hash)
         value_type = hash[:value_type].to_sym
-        unless KNOWN_VALUE_TYPES.include?(value_type)
+        unless self.class.KNOWN_VALUE_TYPES.include?(value_type)
           raise(ArgumentError, "Invalid value type")
         end
         raise(ArgumentError, "No value given") unless hash[:value]
