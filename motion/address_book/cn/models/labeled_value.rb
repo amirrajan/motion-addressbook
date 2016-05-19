@@ -75,6 +75,13 @@ module AddressBook
         @native_ref.value = new_value
       end
 
+      def values
+        { label: @label }.merge(@value)
+      end
+      alias :as_hash :values
+      alias :to_ary :values
+      alias :to_h :values
+
       private
 
       def ruby_hash_to_cn_keys(hash_value)
@@ -161,7 +168,8 @@ module AddressBook
         end
         raise(ArgumentError, "No value given") unless hash[:value]
 
-        @label = hash[:label]
+        @label = hash.delete :label
+        @values = hash
         @value_type = value_type
 
         method =

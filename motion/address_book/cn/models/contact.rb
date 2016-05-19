@@ -108,10 +108,7 @@ module AddressBook
       private
 
       def get_field(cn_field)
-        NSLog "Getting value for #{cn_field}"
         value = record_reference.send(cn_field.to_sym)
-
-        NSLog "Setting value to #{value}"
 
         return value if single_valued_field?(cn_field)
 
