@@ -9,6 +9,8 @@ module AddressBook
           response[variable_as_sym(var)] =
             if var_val.is_a?(Array)
               var_val.map { |array_value| to_h_if_possible(array_value) }
+            elsif var_val.is_a?(NSDateComponents)
+              standard_calendar.dateFromComponents(var_val)
             else
               to_h_if_possible(var_val)
             end
@@ -23,6 +25,10 @@ module AddressBook
       end
 
       private
+
+      def standard_calendar
+        NSCalendar.alloc.initWithCalendarIdentifier(NSCalendarIdentifierGregorian)
+      end
 
       def to_h_if_possible(value)
         value.respond_to?(:to_h) ? value.to_h : value
