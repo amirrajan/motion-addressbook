@@ -5,7 +5,7 @@
 [![Build Status][build-status-image]][build-status-link]
 [![Code Climate][code-climate-image]][code-climate-link]
 
-A RubyMotion wrapper around the iOS and OSX Address Book frameworks for
+A RubyMotion wrapper around the iOS AddressBook and Contacts frameworks for
 RubyMotion apps.
 
 Relevant Apple Docs:
@@ -14,8 +14,10 @@ Relevant Apple Docs:
 |----|-----------|
 | iOS 6-8 | [ABAddressBook][ios-ab-docs-link] |
 | iOS 9+ | [CNContact][ios-cn-docs-link] |
+<!--
 | OSX 10.2-10.10 | [ABAddressBook][mac-ab-docs-link] |
 | OSX 10.11+ | [CNContact][mac-cn-docs-link] |
+-->
 
 ## Requirements
 
@@ -26,7 +28,7 @@ Relevant Apple Docs:
 
 ### Bundler (recommended)
 
-Add it to your Gemfile:
+Add it to your `Gemfile`:
 
 ```ruby
 gem 'motion-addressbook'
@@ -47,31 +49,21 @@ $ gem install motion-addressbook
 
 ## Usage
 
+* Note that `AddressBook` is also aliased to `Contacts`, so all the examples
+  below will also work with that as the class name, e.g. `Contacts.authorized?`
+
 ### Requesting access
 
 1 - Let the gem take care of it for you
 
 ```ruby
-AddressBook.contacts
+AddressBook.contacts { |contacts| NSLog("%@", contacts) }
 ```
 
-This will request authorization if it has not yet been requested, and raise if
-it has already been requested and was denied.
+This will request authorization if it has not yet been requested, and **raise if
+it has already been requested and was denied**.
 
 2 - Manually decide when to ask the user for authorization
-
-```ruby
-# Disable auto-connection before calling anything else, otherwise the gem will
-# automatically request authorization if it has not already been requested
-AddressBook.auto_connect = false
-
-# Do some other stuff (maybe wait for the right screen)
-
-# Automatically connect if we're authorized, otherwise request authorization
-AddressBook.connect
-```
-
-3 - Manually decide when to ask and whether to wait for a response
 
 ```ruby
 # To take full control whether we are already authorized
@@ -112,45 +104,10 @@ end
 The iOS6 simulator does not demand AddressBook authorization. The iOS7 simulator
 does.
 
-### UI -- NEEDS WORK (and untested)
-
-#### Showing the ABPeoplePickerNavigationController
-
-```ruby
-AddressBook::AB::UI::Picker(AddressBook.instance) do |person|
-  if person
-    # person is an AddressBook::Person object
-  else
-    # canceled
-  end
-end
-```
-
-You can also specify the presenting controller:
-
-```ruby
-AddressBook.pick presenter: self do |person|
-  ...
-end
-```
-
-#### Showing the ABNewPersonViewController
-
-```ruby
-AddressBook.create do |person|
-  if person
-    # person is an AddressBook::Person object
-  else
-    # canceled
-  end
-end
-```
-
 ### Working with Person objects
 
-Get a list of existing people from the Address Book. On IOS, results are sorted
-using the sort order (First/Last or Last/First) chosen by the user in iOS
-Settings.
+Get a list of existing people from the Address Book. Results are sorted using
+the sort order (First/Last or Last/First) chosen by the user in iOS Settings.
 
 ```ruby
 AddressBook.people # Aliased to AddressBook.contacts
@@ -164,7 +121,7 @@ numbers, postal address, social profiles, and instant messaging
 profiles.
 
 ```ruby
-AddressBook.person_create(
+AddressBook.people_create(
   first_name: 'Alex',
   last_name: 'Rothenberg',
   emails: [{ label: 'Home', value: 'alex@example.com' }],
@@ -176,7 +133,7 @@ AddressBook.person_create(
 Construct a new Person but do not store it immediately in the Address Book.
 
 ```ruby
-bob = AddressBook.person_new(first_name: 'Bob')
+bob = AddressBook.people_new(first_name: 'Bob')
 => #<AddressBook::Person:-1: {:first_name=>"Bob"}>
 bob.last_name = 'Brown'
 bob.save
@@ -184,7 +141,7 @@ bob.save
 ```
 
 ```ruby
-AddressBook.person_where(email: 'alex@example.com')
+AddressBook.people_where(email: 'alex@example.com')
 => [#<AddressBook::Person:14: {:first_name=>"Alex", :last_name=>"Rothenberg", ...}>]
 ```
 
@@ -195,17 +152,6 @@ alex = AddressBook.person_where(email: 'alex@example.com')
 alex.job_title = 'RubyMotion Developer'
 alex.save
 ```
-
-<!--
-Or to alter all the attributes at once (preserve the record identifier
-but change some or all of the values):
-
-```ruby
-alex = AddressBook.person_where(email: 'alex@example.com')
-alex.replace({:first_name=>"Alex", :last_name=>"Rider", ...})
-alex.save
-```
--->
 
 ### Contact Groups
 
@@ -218,7 +164,7 @@ group.members
 => [#<AddressBook::Person:2: {:first_name=>"Daniel", :last_name=>"Higgins", ...}>]
 ```
 
-### Notifications (\* iOS only \*)
+### Notifications
 
 The iOS Address Book does not deliver notifications of changes through the
 standard Notification Center. `motion-addressbook` wraps the framework
