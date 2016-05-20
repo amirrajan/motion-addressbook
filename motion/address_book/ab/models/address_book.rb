@@ -1,9 +1,12 @@
 module AddressBook
   module AB
     class AddressBook
+      include PublicInterface
+
       # @param autoconnect [Boolean] Whether or not we should automatically
       #   request access on creation
       def initialize(auto_connect = true)
+        @native_ref = Accessors::AddressBook.new_connection
         connect if auto_connect
         self
       end
@@ -13,13 +16,8 @@ module AddressBook
           return (after_connect.nil? ? @native_ref : after_connect.call)
         end
 
-        if Authorization.granted?
-          @native_ref = Accessors::AddressBook.new_connection
-          raise "Unable to create a connection" unless connected?
-          return (after_connect.nil? ? @native_ref : after_connect.call)
-        end
-
         request_authorization do |success, error|
+          raise "Unable to create a connection" unless connected?
           after_connect.call if success && after_connect
         end
       end
@@ -27,7 +25,7 @@ module AddressBook
       # If set, @native_ref will be a __NSCFType, which, unfortunately, is not
       # something you can easily query for, so we check the pointer description
       def connected?
-        Utilities.address_book?(@native_ref)
+        Utilities.address_book?(@native_ref) && Authorization.granted?
       end
 
       # @param block [Proc] will receive one boolean argument indicating whether
@@ -82,96 +80,62 @@ module AddressBook
         ensure_connection! { register_callback(callback) }
       end
 
-      ###############
-      ## Accessors ##
-      ###############
-
-      # Groups
-
-      def groups
-        ensure_connection! do
-          Accessors::Groups.index(@native_ref).map { |group| group_new(group) }
-        end
-      end
-
-      def groups_count
-        ensure_connection! { Accessors::Groups.count(@native_ref) }
-      end
-
-      def group_new(attributes)
-        ensure_connection! { Group.new(attributes, @native_ref) }
-      end
-
-      def group_create(attributes)
-        ensure_connection! { group_new(attributes).save }
-      end
-
-      def group_find(id)
-        ensure_connection! do
-          ab_group = Accessors::Groups.find(@native_ref, id)
-          ab_group && group_new(ab_group)
-        end
-      end
-
-      # People
-
-      def people(options = {})
-        ensure_connection! do
-          Accessors::People.index(@native_ref, options)
-            .map { |ab_person| person_new(ab_person) }
-        end
-      end
-      alias :contacts :people
-
-      def people_changed_since(timestamp)
-        ensure_connection! do
-          Accessors::People.changed_since(@native_ref, timestamp)
-        end
-      end
-      alias :contacts_changed_since :people_changed_since
-
-      def people_count
-        ensure_connection! { Accessors::People.count(@native_ref) }
-      end
-      alias :contacts_count :people_count
-
-      def people_where(conditions)
-        ensure_connection! do
-          people.select { |person| person.matches? conditions }
-        end
-      end
-      alias :contacts_where :people_where
-
-      def person_new(attributes)
-        ensure_connection! { Person.new(attributes, @native_ref) }
-      end
-      alias :contact_new :person_new
-
-      def person_create(attributes)
-        ensure_connection! { person_new(attributes).save }
-      end
-      alias :contact_create :person_create
-
-      def person_find(id)
-        ensure_connection! do
-          ab_person = Accessors::People.find(@native_ref, id)
-          ab_person && person_new(ab_person)
-        end
-      end
-      alias :contact_find :person_find
-
-      # Sources
-
-      def sources
-        ensure_connection! do
-          Accessors::Sources.index(@native_ref).map { |s| Source.new(s) }
-        end
-      end
-
       private
 
-      def ensure_connection!(&after_connect)
-        connected? ? after_connect.call : connect(&after_connect)
+      def connected_groups
+        Accessors::Groups.index(@native_ref)
+          .map { |group| connected_groups_new(group) }
+      end
+
+      def connected_groups_count
+        Accessors::Groups.count(@native_ref)
+      end
+
+      def connected_groups_new(attributes)
+        Group.new(attributes, @native_ref)
+      end
+
+      def connected_groups_create(attributes)
+        connected_groups_new(attributes).save
+      end
+
+      def connected_groups_find(id)
+        ab_group = Accessors::Groups.find(@native_ref, id)
+        ab_group && connected_groups_new(ab_group)
+      end
+
+      def connected_contacts(options = {})
+        Accessors::People.index(@native_ref, options)
+          .map { |ab_person| connected_contact_new(ab_person) }
+      end
+
+      def connected_contacts_changed_since(timestamp)
+        Accessors::People.changed_since(@native_ref, timestamp)
+      end
+
+      def connected_contacts_count
+        Accessors::People.count(@native_ref)
+      end
+
+      def connected_contacts_where(conditions)
+        connected_contacts.select { |person| person.matches? conditions }
+      end
+
+      def connected_contact_new(attributes)
+        Person.new(attributes, @native_ref)
+      end
+
+      def connected_contact_create(attributes)
+        connected_contact_new(attributes).save
+      end
+
+      def connected_contact_find(id)
+        ab_person = Accessors::People.find(@native_ref, id)
+        ab_person && connected_contact_new(ab_person)
+      end
+
+      def connected_sources
+        Accessors::Sources.index(@native_ref).map { |s| Source.new(s) }
       end
 
       def notifier
