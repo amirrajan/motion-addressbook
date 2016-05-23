@@ -1,6 +1,8 @@
 module AddressBook
   module CN
     class LabeledValue
+      INITIALIZATION_ERROR =
+        "LabeledValue must be initialized with an CNLabeledValue or Hash"
       KNOWN_VALUE_TYPES = [
         :address,
         :im_address,
@@ -9,43 +11,38 @@ module AddressBook
         :simple,
         :social_profile
       ]
-      INITIALIZATION_ERROR =
-        "LabeledValue must be initialized with an CNLabeledValue or Hash"
-
-      def self.LABEL_MAP
-        {
-          # Generic Labels
-          :work  => CNLabelWork,
-          :home  => CNLabelHome,
-          :other => CNLabelOther,
-          # Email Labels
-          :icloud => CNLabelEmailiCloud,
-          # URL Labels
-          :home_page => CNLabelURLAddressHomePage,
-          # Date Labels
-          :anniversary => CNLabelDateAnniversary,
-          # Phone Number Labels
-          :mobile    => CNLabelPhoneNumberMobile,
-          :iphone    => CNLabelPhoneNumberiPhone,
-          :main      => CNLabelPhoneNumberMain,
-          :home_fax  => CNLabelPhoneNumberHomeFax,
-          :work_fax  => CNLabelPhoneNumberWorkFax,
-          :other_fax => CNLabelPhoneNumberOtherFax,
-          :pager     => CNLabelPhoneNumberPager,
-          # Relation Labels
-          :father    => CNLabelContactRelationFather,
-          :mother    => CNLabelContactRelationMother,
-          :parent    => CNLabelContactRelationParent,
-          :brother   => CNLabelContactRelationBrother,
-          :sister    => CNLabelContactRelationSister,
-          :child     => CNLabelContactRelationChild,
-          :friend    => CNLabelContactRelationFriend,
-          :spouse    => CNLabelContactRelationSpouse,
-          :partner   => CNLabelContactRelationPartner,
-          :assistant => CNLabelContactRelationAssistant,
-          :manager   => CNLabelContactRelationManager
-        }
-      end
+      LABEL_MAP = {
+        # Generic Labels
+        :work  => CNLabelWork,
+        :home  => CNLabelHome,
+        :other => CNLabelOther,
+        # Email Labels
+        :icloud => CNLabelEmailiCloud,
+        # URL Labels
+        :home_page => CNLabelURLAddressHomePage,
+        # Date Labels
+        :anniversary => CNLabelDateAnniversary,
+        # Phone Number Labels
+        :mobile    => CNLabelPhoneNumberMobile,
+        :iphone    => CNLabelPhoneNumberiPhone,
+        :main      => CNLabelPhoneNumberMain,
+        :home_fax  => CNLabelPhoneNumberHomeFax,
+        :work_fax  => CNLabelPhoneNumberWorkFax,
+        :other_fax => CNLabelPhoneNumberOtherFax,
+        :pager     => CNLabelPhoneNumberPager,
+        # Relation Labels
+        :father    => CNLabelContactRelationFather,
+        :mother    => CNLabelContactRelationMother,
+        :parent    => CNLabelContactRelationParent,
+        :brother   => CNLabelContactRelationBrother,
+        :sister    => CNLabelContactRelationSister,
+        :child     => CNLabelContactRelationChild,
+        :friend    => CNLabelContactRelationFriend,
+        :spouse    => CNLabelContactRelationSpouse,
+        :partner   => CNLabelContactRelationPartner,
+        :assistant => CNLabelContactRelationAssistant,
+        :manager   => CNLabelContactRelationManager
+      }
 
       attr_reader(
         :label,
