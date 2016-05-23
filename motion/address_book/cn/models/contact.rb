@@ -5,55 +5,43 @@ module AddressBook
 
       INITIALIZATION_ERROR =
         "Contact must be initialized with an CNContact or Hash"
-
-      def self.ALL_PROPERTIES
-        self.PROPERTY_MAP.merge(self.MULTI_VALUE_PROPERTY_MAP)
-      end
-
-      def self.MULTI_VALUE_PROPERTY_MAP
-        {
-          CNContactPhoneNumbersKey            => :phones,
-          CNContactEmailAddressesKey          => :emails,
-          CNContactPostalAddressesKey         => :addresses,
-          CNContactDatesKey                   => :dates,
-          CNContactUrlAddressesKey            => :urls,
-          CNContactRelationsKey               => :relations,
-          CNContactSocialProfilesKey          => :social_profiles,
-          CNContactInstantMessageAddressesKey => :im_profiles
-        }
-      end
-
-      def self.PROPERTY_MAP
-        {
-          CNContactNamePrefixKey           => :prefix,
-          CNContactGivenNameKey            => :first_name,
-          CNContactMiddleNameKey           => :middle_name,
-          CNContactFamilyNameKey           => :last_name,
-          CNContactPreviousFamilyNameKey   => :maiden_name,
-          CNContactNameSuffixKey           => :suffix,
-          CNContactNicknameKey             => :nickname,
-          CNContactPhoneticGivenNameKey    => :first_name_phonetic,
-          CNContactPhoneticMiddleNameKey   => :last_name_phonetic,
-          CNContactPhoneticFamilyNameKey   => :middle_name_phonetic,
-          CNContactOrganizationNameKey     => :organization,
-          CNContactDepartmentNameKey       => :department,
-          CNContactJobTitleKey             => :job_title,
-          CNContactBirthdayKey             => :birthday,
-          CNContactNonGregorianBirthdayKey => :non_gregorian_birthday,
-          CNContactNoteKey                 => :note,
-          CNContactImageDataKey            => :image,
-          CNContactThumbnailImageDataKey   => :thumbnail_image,
-          CNContactImageDataAvailableKey   => :image_available,
-          CNContactTypeKey                 => :contact_type,
-        }
-      end
-
-      def self.TYPE_MAP
-        {
-          CNContactTypePerson => :person,
-          CNContactTypeOrganization => :organization
-        }
-      end
+      MULTI_VALUE_PROPERTY_MAP = {
+        CNContactPhoneNumbersKey            => :phones,
+        CNContactEmailAddressesKey          => :emails,
+        CNContactPostalAddressesKey         => :addresses,
+        CNContactDatesKey                   => :dates,
+        CNContactUrlAddressesKey            => :urls,
+        CNContactRelationsKey               => :relations,
+        CNContactSocialProfilesKey          => :social_profiles,
+        CNContactInstantMessageAddressesKey => :im_profiles
+      }
+      PROPERTY_MAP = {
+        CNContactNamePrefixKey           => :prefix,
+        CNContactGivenNameKey            => :first_name,
+        CNContactMiddleNameKey           => :middle_name,
+        CNContactFamilyNameKey           => :last_name,
+        CNContactPreviousFamilyNameKey   => :maiden_name,
+        CNContactNameSuffixKey           => :suffix,
+        CNContactNicknameKey             => :nickname,
+        CNContactPhoneticGivenNameKey    => :first_name_phonetic,
+        CNContactPhoneticMiddleNameKey   => :last_name_phonetic,
+        CNContactPhoneticFamilyNameKey   => :middle_name_phonetic,
+        CNContactOrganizationNameKey     => :organization,
+        CNContactDepartmentNameKey       => :department,
+        CNContactJobTitleKey             => :job_title,
+        CNContactBirthdayKey             => :birthday,
+        CNContactNonGregorianBirthdayKey => :non_gregorian_birthday,
+        CNContactNoteKey                 => :note,
+        CNContactImageDataKey            => :image,
+        CNContactThumbnailImageDataKey   => :thumbnail_image,
+        CNContactImageDataAvailableKey   => :image_available,
+        CNContactTypeKey                 => :contact_type,
+      }
+      TYPE_MAP = {
+        CNContactTypePerson => :person,
+        CNContactTypeOrganization => :organization
+      }
+      ALL_PROPERTIES = PROPERTY_MAP.merge(MULTI_VALUE_PROPERTY_MAP)
 
       attr_accessor(*CN_ATTRIBUTES)
 
@@ -96,15 +84,15 @@ module AddressBook
       end
 
       def multi_valued_field?(cn_field)
-        self.class.MULTI_VALUE_PROPERTY_MAP.keys.include? cn_field
+        MULTI_VALUE_PROPERTY_MAP.keys.include? cn_field
       end
 
       def parse_record!(cn_contact)
         @record_reference = cn_contact
 
-        @type = self.class.TYPE_MAP[record_reference.contactType]
+        @type = TYPE_MAP[record_reference.contactType]
 
-        self.class.ALL_PROPERTIES.each do |cn_field, attribute|
+        ALL_PROPERTIES.each do |cn_field, attribute|
           next if attribute == :contact_type
           record_property = get_field(cn_field)
           next unless record_property
@@ -117,9 +105,9 @@ module AddressBook
       def parse_hash!(hash)
         record_reference # Initializes a new record
 
-        @type = self.class.TYPE_MAP.invert[hash[:type]]
+        @type = TYPE_MAP.invert[hash[:type]]
 
-        self.class.PROPERTY_MAP.each do |_cn_field, attribute|
+        PROPERTY_MAP.each do |_cn_field, attribute|
           next if attribute == :contact_type
           instance_variable_set("@#{attribute}".to_sym, hash[attribute])
         end
@@ -132,7 +120,7 @@ module AddressBook
       end
 
       def single_valued_field?(cn_field)
-        self.class.PROPERTY_MAP.keys.include? cn_field
+        PROPERTY_MAP.keys.include? cn_field
       end
     end
   end

@@ -67,7 +67,7 @@ module AddressBook
 
       def label=(new_value)
         @label = new_value
-        @native_ref.label = self.class.LABEL_MAP[new_value]
+        @native_ref.label = LABEL_MAP[new_value]
       end
 
       def value=(new_value)
@@ -117,12 +117,12 @@ module AddressBook
       end
 
       def localized_label(str)
-        self.class.LABEL_MAP[str] || str
+        LABEL_MAP[str] || str
       end
 
       def parse_record!(cn_record)
         @native_ref = cn_record
-        @label = self.class.LABEL_MAP.invert[cn_record.label]
+        @label = LABEL_MAP.invert[cn_record.label]
         parse_record_value!(cn_record.value)
       end
 
@@ -163,7 +163,7 @@ module AddressBook
 
       def parse_hash!(hash)
         value_type = hash[:value_type].to_sym
-        unless self.class.KNOWN_VALUE_TYPES.include?(value_type)
+        unless KNOWN_VALUE_TYPES.include?(value_type)
           raise(ArgumentError, "Invalid value type")
         end
         raise(ArgumentError, "No value given") unless hash[:value]

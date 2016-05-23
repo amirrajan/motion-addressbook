@@ -3,57 +3,43 @@ module AddressBook
     class Person
       include Common::PublicInterface::Contact
 
-      def self.IMAGE_FORMAT_MAP
-        {
-          :thumbnail => KABPersonImageFormatThumbnail,
-          :full => KABPersonImageFormatOriginalSize
-        }
-      end
-
-      def self.MULTI_VALUE_PROPERTY_MAP
-        {
-          KABPersonPhoneProperty => :phones,
-          KABPersonEmailProperty => :emails,
-          KABPersonAddressProperty => :addresses,
-          KABPersonDateProperty => :dates,
-          KABPersonInstantMessageProperty => :im_profiles,
-          KABPersonURLProperty => :urls,
-          KABPersonRelatedNamesProperty => :relations,
-          KABPersonSocialProfileProperty => :social_profiles
-        }
-      end
-
-      def self.PROPERTY_MAP
-        {
-          KABPersonFirstNameProperty => :first_name,
-          KABPersonLastNameProperty => :last_name,
-          KABPersonMiddleNameProperty => :middle_name,
-          KABPersonFirstNamePhoneticProperty => :first_name_phonetic,
-          KABPersonLastNamePhoneticProperty => :last_name_phonetic,
-          KABPersonMiddleNamePhoneticProperty => :middle_name_phonetic,
-          KABPersonOrganizationProperty => :organization,
-          KABPersonDepartmentProperty => :department,
-          KABPersonNoteProperty => :note,
-          KABPersonBirthdayProperty => :birthday,
-          KABPersonJobTitleProperty => :job_title,
-          KABPersonNicknameProperty => :nickname,
-          KABPersonPrefixProperty => :prefix,
-          KABPersonSuffixProperty => :suffix,
-          KABPersonCreationDateProperty => :creation_date,
-          KABPersonModificationDateProperty => :modification_date
-        }
-      end
-
-      def self.TYPE_MAP
-        {
-          KABPersonKindPerson => :person,
-          KABPersonKindOrganization => :organization
-        }
-      end
-
-      def self.ALL_PROPERTIES
-        self.PROPERTY_MAP.merge(self.MULTI_VALUE_PROPERTY_MAP)
-      end
+      IMAGE_FORMAT_MAP = {
+        :thumbnail => KABPersonImageFormatThumbnail,
+        :full => KABPersonImageFormatOriginalSize
+      }
+      MULTI_VALUE_PROPERTY_MAP = {
+        3 => :phones,          # KABPersonPhoneProperty
+        4 => :emails,          # KABPersonEmailProperty
+        5 => :addresses,       # KABPersonAddressProperty
+        12 => :dates,          # KABPersonDateProperty
+        13 => :im_profiles,    # KABPersonInstantMessageProperty
+        22 => :urls,           # KABPersonURLProperty
+        23 => :relations,      # KABPersonRelatedNamesProperty
+        46 => :social_profiles # KABPersonSocialProfileProperty
+      }
+      PROPERTY_MAP = {
+        0 => :first_name,  # KABPersonFirstNameProperty
+        1 => :last_name,   # KABPersonLastNameProperty
+        6 => :middle_name, # KABPersonMiddleNameProperty
+        # n/a => :first_name_phonetic,  # KABPersonFirstNamePhoneticProperty
+        # n/a => :last_name_phonetic,   # KABPersonLastNamePhoneticProperty
+        # n/a => :middle_name_phonetic, # KABPersonMiddleNamePhoneticProperty
+        10 => :organization,     # KABPersonOrganizationProperty
+        11 => :department,       # KABPersonDepartmentProperty
+        14 => :note,             # KABPersonNoteProperty
+        17 => :birthday,         # KABPersonBirthdayProperty
+        18 => :job_title,        # KABPersonJobTitleProperty
+        19 => :nickname,         # KABPersonNicknameProperty
+        20 => :prefix,           # KABPersonPrefixProperty
+        21 => :suffix,           # KABPersonSuffixProperty
+        26 => :creation_date,    # KABPersonCreationDateProperty
+        27 => :modification_date # KABPersonModificationDateProperty
+      }
+      TYPE_MAP = {
+        0 => :person,      # KABPersonKindPerson
+        1 => :organization # KABPersonKindOrganization
+      }
+      ALL_PROPERTIES = PROPERTY_MAP.merge(MULTI_VALUE_PROPERTY_MAP)
 
       attr_accessor(*AB_ATTRIBUTES)
 
@@ -87,7 +73,7 @@ module AddressBook
 
       def image(format_sym = :full)
         Accessors::People.get_image(record_reference,
-          self.class.IMAGE_FORMAT_MAP[format_sym]
+          IMAGE_FORMAT_MAP[format_sym]
         )
       end
 
@@ -130,7 +116,7 @@ module AddressBook
           instance_variables.each do |variable|
             key = Utilities.variable_as_sym(var)
             variable_sym = variable_as_sym(variable)
-            ab_field = self.class.ALL_PROPERTIES.invert[variable_sym]
+            ab_field = ALL_PROPERTIES.invert[variable_sym]
             next unless ab_field
             new_value = instance_variable_get(variable_sym)
             new_value ? set_field(ab_field, new_value) : remove_field(ab_field)
@@ -182,15 +168,15 @@ module AddressBook
       end
 
       def multi_valued_field?(ab_field)
-        self.class.MULTI_VALUE_PROPERTY_MAP.keys.include? ab_field
+        MULTI_VALUE_PROPERTY_MAP.keys.include? ab_field
       end
 
       def parse_record!(ab_record)
         @record_reference = ab_record
 
-        @type = self.class.TYPE_MAP[get_field(KABPersonKindProperty)]
+        @type = TYPE_MAP[get_field(KABPersonKindProperty)]
 
-        self.class.ALL_PROPERTIES.each do |ab_field, attribute|
+        ALL_PROPERTIES.each do |ab_field, attribute|
           record_property = get_field(ab_field)
           next unless record_property
           instance_variable_set("@#{attribute}".to_sym, record_property)
@@ -202,9 +188,9 @@ module AddressBook
       def parse_hash!(hash)
         record_reference # Initializes a new record
 
-        @type = self.class.TYPE_MAP.invert[hash[:type]]
+        @type = TYPE_MAP.invert[hash[:type]]
 
-        self.class.ALL_PROPERTIES.each do |_ab_field, attribute|
+        ALL_PROPERTIES.each do |_ab_field, attribute|
           instance_variable_set("@#{attribute}".to_sym, hash[attribute])
         end
 
@@ -238,7 +224,7 @@ module AddressBook
       end
 
       def single_valued_field?(ab_field)
-        self.class.PROPERTY_MAP.keys.include? ab_field
+        PROPERTY_MAP.keys.include? ab_field
       end
     end
   end
