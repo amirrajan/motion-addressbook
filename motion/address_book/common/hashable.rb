@@ -1,7 +1,7 @@
 module AddressBook
-  module Shared
+  module Common
     module Hashable
-      def attributes
+      def to_h
         response = {}
         instance_variables.each do |var|
           var_val = instance_variable_get(var)
@@ -17,7 +17,6 @@ module AddressBook
         end
         response
       end
-      alias :to_h :attributes
       alias :to_hash :to_h
 
       def variable_as_sym(variable)

@@ -121,8 +121,17 @@ module AddressBook
           ABRecordCopyValue(record_reference, field)
         end
 
+        def get_image(record_reference, image_format = nil)
+          image_format ||= KABPersonImageFormatOriginalSize
+          ABPersonCopyImageDataWithFormat(record_reference, image_format)
+        end
+
         def get_uid(record_reference)
           ABRecordGetRecordID(record_reference)
+        end
+
+        def image_available?(record_reference)
+          ABPersonHasImageData(record_reference)
         end
 
         # @param connection [ABAddressBook]
@@ -154,6 +163,12 @@ module AddressBook
         def set_field(field, value)
           error = nil
           ABRecordSetValue(record_reference, field, value, error)
+          raise(error) if error
+        end
+
+        def set_image(record_reference, image_data)
+          error = nil
+          ABPersonSetImageData(record_reference, image_data, error)
           raise(error) if error
         end
       end

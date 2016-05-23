@@ -9,7 +9,7 @@ end
 
 Motion::Project::App.setup do |app|
   app.files.unshift(File.join(lib_dir_path, "../motion/address_book.rb"))
-  app.files.unshift(globbed_files(project_path, "/shared/**.rb"))
+  app.files.unshift(globbed_files(project_path, "/common/**/*.rb"))
 
   # Added as weak in case the app.deployment_target < 9
   app.weak_frameworks += ['Contacts', 'ContactsUI']

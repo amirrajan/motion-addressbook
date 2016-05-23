@@ -1,7 +1,7 @@
 module AddressBook
   module AB
     class AddressBook
-      include PublicInterface
+      include Common::PublicInterface::ContactAccessor
 
       # @param autoconnect [Boolean] Whether or not we should automatically
       #   request access on creation

@@ -1,7 +1,14 @@
 module AddressBook
   module AB
     class Person
-      include AddressBook::Shared::Hashable
+      include Common::PublicInterface::Contact
+
+      def self.IMAGE_FORMAT_MAP
+        {
+          :thumbnail => KABPersonImageFormatThumbnail,
+          :full => KABPersonImageFormatOriginalSize
+        }
+      end
 
       def self.MULTI_VALUE_PROPERTY_MAP
         {
@@ -11,7 +18,7 @@ module AddressBook
           KABPersonDateProperty => :dates,
           KABPersonInstantMessageProperty => :im_profiles,
           KABPersonURLProperty => :urls,
-          KABPersonRelatedNamesProperty => :related_names,
+          KABPersonRelatedNamesProperty => :relations,
           KABPersonSocialProfileProperty => :social_profiles
         }
       end
@@ -21,9 +28,9 @@ module AddressBook
           KABPersonFirstNameProperty => :first_name,
           KABPersonLastNameProperty => :last_name,
           KABPersonMiddleNameProperty => :middle_name,
-          # KABPersonFirstNamePhoneticProperty => :first_name_phonetic,
-          # KABPersonLastNamePhoneticProperty => :last_name_phonetic,
-          # KABPersonMiddleNamePhoneticProperty => :middle_name_phonetic,
+          KABPersonFirstNamePhoneticProperty => :first_name_phonetic,
+          KABPersonLastNamePhoneticProperty => :last_name_phonetic,
+          KABPersonMiddleNamePhoneticProperty => :middle_name_phonetic,
           KABPersonOrganizationProperty => :organization,
           KABPersonDepartmentProperty => :department,
           KABPersonNoteProperty => :note,
@@ -48,31 +55,7 @@ module AddressBook
         self.PROPERTY_MAP.merge(self.MULTI_VALUE_PROPERTY_MAP)
       end
 
-      attr_accessor(
-        # Single-values
-        :first_name,
-        :last_name,
-        :middle_name,
-        :organization,
-        :department,
-        :note,
-        :birthday,
-        :job_title,
-        :nickname,
-        :prefix,
-        :suffix,
-        :creation_date,
-        :modification_date,
-        # Multi-values
-        :phones,
-        :emails,
-        :addresses,
-        :dates,
-        :im_profiles,
-        :urls,
-        :related_names,
-        :social_profiles,
-      )
+      attr_accessor(*AB_ATTRIBUTES)
 
       attr_reader :type
 
@@ -100,6 +83,20 @@ module AddressBook
         @record_reference = nil
 
         self
+      end
+
+      def image(format_sym = :full)
+        Accessors::People.get_image(record_reference,
+          self.class.IMAGE_FORMAT_MAP[format_sym]
+        )
+      end
+
+      def image=(image_data)
+        Accessors::People.set_image(record_reference, image_data)
+      end
+
+      def image_available
+        Accessors::People.image_available?(record_reference)
       end
 
       def matches?(conditions)
@@ -131,7 +128,7 @@ module AddressBook
       def save!
         if persisted?
           instance_variables.each do |variable|
-            key = Shared::Utilities.variable_as_sym(var)
+            key = Utilities.variable_as_sym(var)
             variable_sym = variable_as_sym(variable)
             ab_field = self.class.ALL_PROPERTIES.invert[variable_sym]
             next unless ab_field
@@ -145,6 +142,10 @@ module AddressBook
         Accessors::AddressBook.save(address_book)
 
         self
+      end
+
+      def thumbnail_image
+        image(:thumbnail)
       end
 
       def to_s
@@ -173,6 +174,11 @@ module AddressBook
           result = Accessors::People.get_field(record_reference, ab_field)
           NSLog "Unknown field: #{ab_field} -- #{result}"
         end
+      end
+
+      def method_missing(method_name, *args, &block)
+        return nil if (CN_ATTRIBUTES - AB_ATTRIBUTES).include?(method_name)
+        super
       end
 
       def multi_valued_field?(ab_field)

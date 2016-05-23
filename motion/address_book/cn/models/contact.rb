@@ -1,7 +1,7 @@
 module AddressBook
   module CN
     class Contact
-      include AddressBook::Shared::Hashable
+      include Common::PublicInterface::Contact
 
       INITIALIZATION_ERROR =
         "Contact must be initialized with an CNContact or Hash"
@@ -55,36 +55,7 @@ module AddressBook
         }
       end
 
-      attr_accessor(
-        :prefix,
-        :first_name,
-        :middle_name,
-        :last_name,
-        :maiden_name,
-        :suffix,
-        :nickname,
-        :first_name_phonetic,
-        :last_name_phonetic,
-        :middle_name_phonetic,
-        :organization,
-        :department,
-        :job_title,
-        :birthday,
-        :non_gregorian_birthday,
-        :note,
-        :image,
-        :thumbnail_image,
-        :image_available,
-        :contact_type,
-        :phones,
-        :emails,
-        :addresses,
-        :dates,
-        :urls,
-        :relations,
-        :social_profiles,
-        :im_profiles
-      )
+      attr_accessor(*CN_ATTRIBUTES)
 
       def initialize(hash_or_record)
         if hash_or_record.is_a?(CNContact) then parse_record!(hash_or_record)
@@ -93,6 +64,11 @@ module AddressBook
         end
 
         self
+      end
+
+      def method_missing(method_name, *args, &block)
+        return nil if (AB_ATTRIBUTES - CN_ATTRIBUTES).include?(method_name)
+        super
       end
 
       def to_s

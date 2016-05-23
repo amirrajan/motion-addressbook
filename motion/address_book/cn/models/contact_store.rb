@@ -1,7 +1,7 @@
 module AddressBook
   module CN
     class ContactStore
-      include PublicInterface
+      include Common::PublicInterface::ContactAccessor
 
       def initialize(auto_connect = false)
         @native_ref = CNContactStore.new
