@@ -1,33 +1,28 @@
 module AddressBook
   module CN
     module Authorization
+      ENTITY_MAP = { contacts: CNEntityTypeContacts }
+      STATUS_MAP = {
+        CNAuthorizationStatusNotDetermined => :not_determined,
+        CNAuthorizationStatusRestricted => :restricted,
+        CNAuthorizationStatusDenied => :denied,
+        CNAuthorizationStatusAuthorized => :authorized
+      }
+
       class << self
-        def ENTITY_MAP
-          { contacts: CNEntityTypeContacts }
-        end
-
-        def STATUS_MAP
-          {
-            CNAuthorizationStatusNotDetermined => :not_determined,
-            CNAuthorizationStatusRestricted => :restricted,
-            CNAuthorizationStatusDenied => :denied,
-            CNAuthorizationStatusAuthorized => :authorized
-          }
-        end
-
         def granted?
           status == :authorized
         end
 
         def request(&callback)
-          instance.requestAccessForEntityType(self.ENTITY_MAP[:contacts],
+          instance.requestAccessForEntityType(ENTITY_MAP[:contacts],
             completionHandler: callback
           )
         end
 
         def status
-          self.STATUS_MAP[
-            Accessors::ContactStore.status_for_type(self.ENTITY_MAP[:contacts])
+          STATUS_MAP[
+            Accessors::ContactStore.status_for_type(ENTITY_MAP[:contacts])
           ]
         end
 

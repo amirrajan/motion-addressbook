@@ -13,35 +13,35 @@ module AddressBook
       ]
       LABEL_MAP = {
         # Generic Labels
-        :work  => CNLabelWork,
-        :home  => CNLabelHome,
-        :other => CNLabelOther,
+        :work  => "_$!<Work>!$_",  # CNLabelWork
+        :home  => "_$!<Home>!$_",  # CNLabelHome
+        :other => "_$!<Other>!$_", # CNLabelOther
         # Email Labels
-        :icloud => CNLabelEmailiCloud,
+        :icloud => "iCloud", # CNLabelEmailiCloud
         # URL Labels
-        :home_page => CNLabelURLAddressHomePage,
+        :home_page => "_$!<HomePage>!$_", # CNLabelURLAddressHomePage
         # Date Labels
-        :anniversary => CNLabelDateAnniversary,
+        :anniversary => "_$!<Anniversary>!$_", # CNLabelDateAnniversary
         # Phone Number Labels
-        :mobile    => CNLabelPhoneNumberMobile,
-        :iphone    => CNLabelPhoneNumberiPhone,
-        :main      => CNLabelPhoneNumberMain,
-        :home_fax  => CNLabelPhoneNumberHomeFax,
-        :work_fax  => CNLabelPhoneNumberWorkFax,
-        :other_fax => CNLabelPhoneNumberOtherFax,
-        :pager     => CNLabelPhoneNumberPager,
+        :mobile    => "_$!<Mobile>!$_",   # CNLabelPhoneNumberMobile
+        :iphone    => "iPhone",           # CNLabelPhoneNumberiPhone
+        :main      => "_$!<Main>!$_",     # CNLabelPhoneNumberMain
+        :home_fax  => "_$!<HomeFAX>!$_",  # CNLabelPhoneNumberHomeFax
+        :work_fax  => "_$!<WorkFAX>!$_",  # CNLabelPhoneNumberWorkFax
+        :other_fax => "_$!<OtherFAX>!$_", # CNLabelPhoneNumberOtherFax
+        :pager     => "_$!<Pager>!$_",    # CNLabelPhoneNumberPager
         # Relation Labels
-        :father    => CNLabelContactRelationFather,
-        :mother    => CNLabelContactRelationMother,
-        :parent    => CNLabelContactRelationParent,
-        :brother   => CNLabelContactRelationBrother,
-        :sister    => CNLabelContactRelationSister,
-        :child     => CNLabelContactRelationChild,
-        :friend    => CNLabelContactRelationFriend,
-        :spouse    => CNLabelContactRelationSpouse,
-        :partner   => CNLabelContactRelationPartner,
-        :assistant => CNLabelContactRelationAssistant,
-        :manager   => CNLabelContactRelationManager
+        :father    => "_$!<Father>!$_",    # CNLabelContactRelationFather
+        :mother    => "_$!<Mother>!$_",    # CNLabelContactRelationMother
+        :parent    => "_$!<Parent>!$_",    # CNLabelContactRelationParent
+        :brother   => "_$!<Brother>!$_",   # CNLabelContactRelationBrother
+        :sister    => "_$!<Sister>!$_",    # CNLabelContactRelationSister
+        :child     => "_$!<Child>!$_",     # CNLabelContactRelationChild
+        :friend    => "_$!<Friend>!$_",    # CNLabelContactRelationFriend
+        :spouse    => "_$!<Spouse>!$_",    # CNLabelContactRelationSpouse
+        :partner   => "_$!<Partner>!$_",   # CNLabelContactRelationPartner
+        :assistant => "_$!<Assistant>!$_", # CNLabelContactRelationAssistant
+        :manager   => "_$!<Manager>!$_"    # CNLabelContactRelationManager
       }
 
       attr_reader(
