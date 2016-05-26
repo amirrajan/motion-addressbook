@@ -4,34 +4,34 @@ module AddressBook
       INITIALIZATION_ERROR =
         "MultiValuedAttribute must be initialized with an ABMultiValue or Hash"
       LABEL_MAP = {
-        :mobile      => KABPersonPhoneMobileLabel,
-        :iphone      => KABPersonPhoneIPhoneLabel,
-        :main        => KABPersonPhoneMainLabel,
-        :home_fax    => KABPersonPhoneHomeFAXLabel,
-        :work_fax    => KABPersonPhoneWorkFAXLabel,
-        :pager       => KABPersonPhonePagerLabel,
-        :work        => KABWorkLabel,
-        :home        => KABHomeLabel,
-        :other       => KABOtherLabel,
-        :home_page   => KABPersonHomePageLabel,
-        :anniversary => KABPersonAnniversaryLabel
+        :mobile      => "_$!<Mobile>!$_",      # KABPersonPhoneMobileLabel
+        :iphone      => "iPhone",              # KABPersonPhoneIPhoneLabel
+        :main        => "_$!<Main>!$_",        # KABPersonPhoneMainLabel
+        :home_fax    => "_$!<HomeFAX>!$_",     # KABPersonPhoneHomeFAXLabel
+        :work_fax    => "_$!<WorkFAX>!$_",     # KABPersonPhoneWorkFAXLabel
+        :pager       => "_$!<Pager>!$_",       # KABPersonPhonePagerLabel
+        :work        => "_$!<Work>!$_",        # KABWorkLabel
+        :home        => "_$!<Home>!$_",        # KABHomeLabel
+        :other       => "_$!<Other>!$_",       # KABOtherLabel
+        :home_page   => "_$!<HomePage>!$_",    # KABPersonHomePageLabel
+        :anniversary => "_$!<Anniversary>!$_", # KABPersonAnniversaryLabel
       }
       PROPERTY_MAP = {
-        KABPersonAddressStreetKey => :street,
-        KABPersonAddressCityKey => :city,
-        KABPersonAddressStateKey => :state,
-        KABPersonAddressZIPKey => :postalcode,
-        KABPersonAddressCountryKey => :country,
-        KABPersonAddressCountryCodeKey => :country_code,
+        "Street"      => :street,       # KABPersonAddressStreetKey
+        "City"        => :city,         # KABPersonAddressCityKey
+        "State"       => :state,        # KABPersonAddressStateKey
+        "ZIP"         => :postalcode,   # KABPersonAddressZIPKey
+        "Country"     => :country,      # KABPersonAddressCountryKey
+        "CountryCode" => :country_code, # KABPersonAddressCountryCodeKey
 
-        KABPersonSocialProfileServiceKey => :service,
-        KABPersonSocialProfileURLKey => :url,
-        KABPersonSocialProfileUsernameKey => :username,
-        KABPersonSocialProfileUserIdentifierKey => :userid,
+        "service"    => :service,  # KABPersonSocialProfileServiceKey
+        "url"        => :url,      # KABPersonSocialProfileURLKey
+        "username"   => :username, # KABPersonSocialProfileUsernameKey
+        "identifier" => :userid,   # KABPersonSocialProfileUserIdentifierKey
 
         # these keys are identical to the SocialProfile keys above
-        KABPersonInstantMessageServiceKey => :service,
-        KABPersonInstantMessageUsernameKey => :username
+        "service"  => :service, # KABPersonInstantMessageServiceKey
+        "username" => :username # KABPersonInstantMessageUsernameKey
       }
 
       def initialize(value_array_or_record)

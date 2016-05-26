@@ -4,8 +4,8 @@ module AddressBook
       include Common::PublicInterface::Contact
 
       IMAGE_FORMAT_MAP = {
-        :thumbnail => KABPersonImageFormatThumbnail,
-        :full => KABPersonImageFormatOriginalSize
+        :thumbnail => 0, # KABPersonImageFormatThumbnail
+        :full      => 2  # KABPersonImageFormatOriginalSize
       }
       MULTI_VALUE_PROPERTY_MAP = {
         3 => :phones,          # KABPersonPhoneProperty
