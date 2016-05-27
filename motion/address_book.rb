@@ -17,6 +17,10 @@ module AddressBook
       auth_handler.status
     end
 
+    def can_attempt_access?
+      [:authorized, :not_determined].include? authorization_status
+    end
+
     def framework_as_sym
       case UIDevice.currentDevice.systemVersion.to_i
       when 6, 7, 8 then :ab # ABAddressBook - https://goo.gl/2Xbebu
