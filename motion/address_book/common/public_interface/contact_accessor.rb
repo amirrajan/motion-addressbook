@@ -46,8 +46,11 @@ module AddressBook
 
         # People
 
+        # This one is not like the others.
+        # Because of memory constraints, fetching contacts must be done in
+        # batches so **the callback will be called multiple times**
         def contacts(options = {}, &callback)
-          with_connection(:connected_contacts, options, &callback)
+          ensure_connection! { connected_contacts(options, &callback) }
         end
         alias :people :contacts
 

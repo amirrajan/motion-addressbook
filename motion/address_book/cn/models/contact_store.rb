@@ -43,9 +43,15 @@ module AddressBook
 
       private
 
-      def connected_contacts(options)
-        Accessors::Contacts.index(@native_ref)
-          .map { |cn_contact| connected_contacts_new(cn_contact) }
+      def connected_contacts(options, &callback)
+        Accessors::Contacts.index(@native_ref) do |contacts, error|
+          raise error if error
+
+          mapped_contacts =
+            contacts.map { |cn_contact| connected_contacts_new(cn_contact) }
+
+          callback.call(mapped_contacts)
+        end
       end
 
       def connected_contacts_changed_since(timestamp)
