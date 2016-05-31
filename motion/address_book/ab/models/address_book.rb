@@ -104,9 +104,11 @@ module AddressBook
         ab_group && connected_groups_new(ab_group)
       end
 
-      def connected_contacts(options = {})
-        Accessors::People.index(@native_ref, options)
+      def connected_contacts(options = {}, &callback)
+        people = Accessors::People.index(@native_ref, options)
           .map { |ab_person| connected_contact_new(ab_person) }
+
+        callback.call(people)
       end
 
       def connected_contacts_changed_since(timestamp)
