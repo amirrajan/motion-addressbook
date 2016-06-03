@@ -23,7 +23,12 @@ module AddressBook; module CN; module Accessors
       def index(connection, &callback)
         identifiers = all_identifiers(connection)
 
-        identifiers.each_slice(ids_per_thread(identifiers)) do |contact_ids|
+        slice_size = ids_per_thread(identifiers)
+
+        # Callback with empty contacts array and nil error
+        return callback.call([], nil) unless slice_size > 0
+
+        identifiers.each_slice(slice_size) do |contact_ids|
           async_fetch(connection, contact_ids, callback)
         end
       end
@@ -66,7 +71,7 @@ module AddressBook; module CN; module Accessors
       end
 
       def ids_per_thread(ids)
-        ids.count > THREADS ? (ids.count / THREADS).ceil : ids.count
+        ids.size > THREADS ? (ids.size / THREADS).ceil : ids.count
       end
 
       def predicate_for_ids(id_array)
