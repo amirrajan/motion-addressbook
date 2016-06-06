@@ -34,8 +34,8 @@ module AddressBook
       def request_authorization(&block)
         synchronous = !block
 
-        Authorization.request(@native_ref) do |granted, error|
-          raise(error) if !granted && error
+        Authorization.request(@native_ref) do |granted, _error|
+          # error is just an explaination of why access was denied
           @access_granted = granted
           block.call(@access_granted) unless block.nil?
         end
