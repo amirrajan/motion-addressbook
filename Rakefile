@@ -20,6 +20,7 @@ Motion::Project::App.setup do |app|
     app.info_plist['LSUIElement'] = true
   else
     app.specs_dir = "./spec/ios"
+    app.info_plist['NSContactsUsageDescription'] = 'Unified Contact access'
   end
 end
 

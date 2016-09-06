@@ -9,5 +9,9 @@ xcode_sdk:
   - iphonesimulator9.1
   - iphonesimulator9.2
   - iphonesimulator9.3
+matrix:
+  include:
+    - osx_image: xcode8
+      xcode_sdk: iphonesimulator10.0
 before_install: sudo motion update
 script: bundle exec rake spec

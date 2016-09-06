@@ -22,7 +22,7 @@ Relevant Apple Docs:
 ## Requirements
 
 * RubyMotion >= 2.8
-* iOS 6-9
+* iOS 6-10
 
 ## Installation
 
@@ -45,6 +45,18 @@ Bundler.require
 
 ```bash
 $ gem install motion-addressbook
+```
+
+### iOS 10 Support
+
+iOS 10 added the requirement to specify what your app uses its Contact access
+for. To do this, add a short description to your
+`info_plist['NSContactsUsageDescription']`, like so:
+
+```ruby
+Motion::Project::App.setup do |app|
+  app.info_plist['NSContactsUsageDescription'] = 'YOUR DESCRIPTION HERE'
+end
 ```
 
 ## Usage
