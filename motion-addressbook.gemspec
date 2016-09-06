@@ -6,11 +6,11 @@ Gem::Specification.new do |gem|
   gem.version       = Motion::Addressbook::VERSION
   gem.license       = 'MIT'
 
-  gem.authors       = ["Alex Rothenberg", "Jason May"]
-  gem.email         = ["alex@alexrothenberg.com", "jmay@pobox.com"]
-  gem.description   = %q{A RubyMotion wrapper around the iOS & OSX Address Book frameworks}
-  gem.summary       = %q{A RubyMotion wrapper around the iOS & OSX Address Book frameworks}
-  gem.homepage      = ""
+  gem.authors       = ["Alex Rothenberg", "Jason May", "Jonathan Bender"]
+  gem.email         = ["alex@alexrothenberg.com", "jmay@pobox.com", "jlbender@gmail.com"]
+  gem.description   = %q{A RubyMotion wrapper around the ABAddressBook and CNContact frameworks}
+  gem.summary       = %q{A RubyMotion wrapper around the ABAddressBook and CNContact frameworks}
+  gem.homepage      = "https://github.com/alexrothenberg/motion-addressbook"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -19,5 +19,5 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'newclear'
-  gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'motion-spec'
 end

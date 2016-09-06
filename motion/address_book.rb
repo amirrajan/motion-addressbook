@@ -36,7 +36,7 @@ module AddressBook
     private
 
     def auto_connect
-      @auto_connect || true
+      @auto_connect ||= true
     end
 
     def create_contact_accessor
