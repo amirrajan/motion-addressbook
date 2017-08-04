@@ -24,7 +24,7 @@ module AddressBook
     def framework_as_sym
       case UIDevice.currentDevice.systemVersion.to_i
       when 6, 7, 8 then :ab # ABAddressBook - https://goo.gl/2Xbebu
-      when 9, 10 then :cn   # CNContact - https://goo.gl/RDAlRw
+      when 9, 10, 11 then :cn   # CNContact - https://goo.gl/RDAlRw
       else raise "This iOS is not supported by motion-addressbook"
       end
     end
