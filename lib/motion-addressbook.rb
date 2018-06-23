@@ -4,7 +4,7 @@ lib_dir_path = File.dirname(File.expand_path(__FILE__))
 project_path = File.join(lib_dir_path, "../motion/address_book")
 
 def globbed_files(root, path)
-  Dir.glob(File.join(root, path))
+  Dir.glob(File.join(root, path)).sort
 end
 
 Motion::Project::App.setup do |app|
